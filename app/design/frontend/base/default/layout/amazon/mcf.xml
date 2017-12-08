@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addCss"><file>css/amazon/mcf.css</file></action>
+        </reference>
+    </default>
+
+    <catalog_product_view>
+        <reference name="product.info.extrahint">
+            <block type="amazon_mcf/catalog_deliveryEstimate" name="product.amazon.delivery" template="amazon/catalog/product_delivery.phtml"/>
+        </reference>
+    </catalog_product_view>
+</layout>

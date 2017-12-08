@@ -1,0 +1,204 @@
+<?xml version="1.0" ?>
+<config>
+    <modules>
+        <Amazon_MCF>
+            <version>0.4.0</version>
+        </Amazon_MCF>
+    </modules>
+
+    <global>
+        <blocks>
+            <amazon_mcf>
+                <class>Amazon_MCF_Block</class>
+            </amazon_mcf>
+
+            <adminhtml>
+                <rewrite>
+                    <catalog_product_grid>Amazon_MCF_Block_Catalog_Product_Grid</catalog_product_grid>
+                </rewrite>
+            </adminhtml>
+        </blocks>
+
+        <helpers>
+            <amazon_mcf>
+                <class>Amazon_MCF_Helper</class>
+            </amazon_mcf>
+        </helpers>
+
+        <models>
+            <amazon_mcf>
+                <class>Amazon_MCF_Model</class>
+                <resourceModel>amazon_mcf_resource</resourceModel>
+            </amazon_mcf>
+
+            <amazon_mcf_resource>
+                <class>Amazon_MCF_Model_Resource</class>
+            </amazon_mcf_resource>
+        </models>
+
+        <!--<template>-->
+            <!--<email>-->
+                <!--<system_cron_error_email_template translate="label" module="amazon_mcf">-->
+                    <!--<label>Cron error</label>-->
+                    <!--<file>amazon_mcf/cron_error.html</file>-->
+                    <!--<type>text</type>-->
+                <!--</system_cron_error_email_template>-->
+            <!--</email>-->
+        <!--</template>-->
+
+        <resources>
+            <amazonmcf_product_setup>
+                <setup>
+                    <module>Amazon_MCF</module>
+                    <class>Mage_Catalog_Model_Resource_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </amazonmcf_product_setup>
+        </resources>
+
+        <events>
+            <sales_order_place_after>
+                <observers>
+                    <amazon_mcf_submit_to_amazon>
+                        <class>amazon_mcf/observer</class>
+                        <method>submitOrderToAmazon</method>
+                    </amazon_mcf_submit_to_amazon>
+                </observers>
+            </sales_order_place_after>
+
+            <order_cancel_after>
+                <observers>
+                    <amazon_mcf_submit_to_amazon>
+                        <class>amazon_mcf/observer</class>
+                        <method>cancelOrderToAmazon</method>
+                    </amazon_mcf_submit_to_amazon>
+                </observers>
+            </order_cancel_after>
+
+            <catalog_product_save_after>
+                <observers>
+                    <amazon_mcf_verify_amazon_sku>
+                        <class>amazon_mcf/observer</class>
+                        <method>verifyAmazonSku</method>
+                    </amazon_mcf_verify_amazon_sku>
+                </observers>
+            </catalog_product_save_after>
+        </events>
+
+        <fieldsets>
+            <sales_convert_quote_item>
+                <amazon_mcf_enabled>
+                    <to_order_item>*</to_order_item>
+                </amazon_mcf_enabled>
+            </sales_convert_quote_item>
+        </fieldsets>
+
+        <sales>
+            <quote>
+                <item>
+                    <product_attributes>
+                        <amazon_mcf_enabled/>
+                        <amazon_mcf_sku/>
+                    </product_attributes>
+                </item>
+            </quote>
+        </sales>
+    </global>
+
+    <frontend>
+        <routers>
+            <amazon_mcf>
+                <use>standard</use>
+                <args>
+                    <module>Amazon_MCF</module>
+                    <frontName>fba</frontName>
+                </args>
+            </amazon_mcf>
+        </routers>
+        <layout>
+            <updates>
+                <amazon_mcf>
+                    <file>amazon/mcf.xml</file>
+                </amazon_mcf>
+            </updates>
+        </layout>
+    </frontend>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Amazon_MCF after="Mage_Adminhtml">Amazon_MCF</Amazon_MCF>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <crontab>
+        <jobs>
+            <amazon_mcf_order_update>
+                <schedule>
+                    <cron_expr>0 */2 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>amazon_mcf/cron_orders::orderUpdate</model>
+                </run>
+            </amazon_mcf_order_update>
+            <amazon_mcf_resubmit_orders>
+                <schedule>
+                    <cron_expr>*/10 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>amazon_mcf/cron_orders::resubmitOrdersToAmazon</model>
+                </run>
+            </amazon_mcf_resubmit_orders>
+            <amazon_mcf_inventory_sync>
+                <schedule>
+                    <cron_expr>*/15 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>amazon_mcf/cron_inventory::inventoryUpdate</model>
+                </run>
+            </amazon_mcf_inventory_sync>
+            <amazon_mcf_inventory_full_sync>
+                <schedule>
+                    <cron_expr>*/15 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>amazon_mcf/cron_inventory::cronFullInventoryStatus</model>
+                </run>
+            </amazon_mcf_inventory_full_sync>
+        </jobs>
+    </crontab>
+
+    <default>
+        <carriers>
+            <amazon_mcf_carrier>
+                <active>1</active>
+                <model>amazon_mcf/carrier_amazon</model>
+                <title>Amazon MCF Shipping</title>
+                <sort_order>10</sort_order>
+                <sallowspecific>0</sallowspecific>
+            </amazon_mcf_carrier>
+        </carriers>
+        <amazon_mcf>
+            <credentials>
+                <marketplace>US</marketplace>
+            </credentials>
+            <options>
+                <display_estimated_arrival>1</display_estimated_arrival>
+            </options>
+            <onsite_delivery_options>
+                <enable_delivery_estimator_pdp>0</enable_delivery_estimator_pdp>
+                <default_standard_shipping_cost>5</default_standard_shipping_cost>
+                <default_expedited_shipping_cost>10</default_expedited_shipping_cost>
+                <default_priority_shipping_cost>15</default_priority_shipping_cost>
+            </onsite_delivery_options>
+        </amazon_mcf>
+    </default>
+
+</config>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <amazon_mcf translate="title" module="amazon_mcf">
+                                        <title>Amazon MCF</title>
+                                        <sort_order>1</sort_order>
+                                        <children>
+                                            <amazon_mcf_config translate="title">
+                                                <title>Amazon MCF Configuration</title>
+                                                <sort_order>10</sort_order>
+                                            </amazon_mcf_config>
+                                        </children>
+                                    </amazon_mcf>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+if ($this->isFBAEnabled()): ?>
+    <script>
+      var defaultMessage = <?php echo '"'. $this->__('No estimate available. Change product quantity or try a different postal code.').'"'; ?>;
+      var zip = '';
+      var weekDays = <?php echo '["' . $this->__('Sunday') . '", "' . $this->__('Monday') . '", "' . $this->__('Tuesday') . '", "' . $this->__('Wednesday') . '", "' . $this->__('Thursday') . '", "' . $this->__('Friday') . '", "' . $this->__('Saturday') . '"]'; ?>;
+      var months = <?php echo '["' . $this->__('Jan') . '", "' . $this->__('Feb') . '", "' . $this->__('Mar') . '", "' . $this->__('Apr') . '", "' . $this->__('May') . '", "' . $this->__('Jun') . '", "' . $this->__('Jul') . '", "' . $this->__('Aug') . '", "' . $this->__('Sep') . '", "' . $this->__('Oct') . '", "' . $this->__('Nov') . '", "' . $this->__('Dec') . '"]'; ?>;
+      // When form key is not available, set a placeholder so that calls can be
+      // made to json controller without jquery errors.
+      if (!window.FORM_KEY || window.FORM_KEY === 'undefined') {
+        window.FORM_KEY = 'magentoFormKey';
+      }
+
+      function getRates() {
+        zip = $('amazon-fba-zip').value;
+        var qty = 1;
+
+        var qtyElement = $$('.qty-wrapper input.input-text.qty').first();
+        if (qtyElement && qtyElement.value.length) {
+          qty = qtyElement.value;
+        }
+
+        if (zip) {
+          params = {
+            'product_id': '<?php echo $this->getProductId(); ?>',
+            'zip': zip,
+            'qty': qty
+          };
+
+          new Ajax.Request('/fba/ajax/deliveryEstimate', {
+            loaderArea: true,
+            asynchronous: true,
+            parameters: params,
+            onSuccess: function (transport) {
+
+              var response = JSON.parse(transport.responseText);
+              var markup = '<li>'+defaultMessage+'</li>';
+
+              if (response.data && response.data.length > 0) {
+                Mage.Cookies.set('AmazonFBA', zip);
+                var markup = '';
+                var count = response.data.length;
+
+                for (var i = 0; i < count; i++) {
+                  // var earliestDate = new Date(response.data[i].earliest);
+                  var latestDate = new Date(response.data[i].latest);
+                  // var earliest = weekDays[earliestDate.getDay()]+',  '+months[earliestDate.getMonth()] + '. '+earliestDate.getDate();
+                  var latest = weekDays[latestDate.getDay()] + ',  ' + months[latestDate.getMonth()] + '. ' + latestDate.getDate();
+
+                  markup += '<li><b>by ' + latest + '</b> ';
+                  markup += response.data[i].type + '</li>';
+                }
+              }
+              else {
+                // assume zip entered is invalid, clear cookie
+                Mage.Cookies.set('AmazonFBA', '');
+              }
+
+              $('amazon-fba-container').update('<ul>' + markup + '</ul><div class="amazon-fba-logo"></div>');
+            }
+          });
+        }
+      }
+
+      document.observe('dom:loaded', function() {
+        $('amazon-rates').observe('click', function () {
+          getRates();
+          return false;
+        });
+
+        zip = Mage.Cookies.get('AmazonFBA', '');
+        if (zip) {
+          jQuery('#amazon-fba-zip').val(zip);
+          getRates();
+        }
+      });
+
+    </script>
+
+    <div id="amazon-fba-estimate">
+        <p class="est-info">Estimated delivery date</p>
+        <div class="estimate-region">
+            <label>Ship to: </label> <input id="amazon-fba-zip" type="text"
+                                            class="input-text qty"
+                                            name="postalcode"
+                                            placeholder="Postal Code"/>
+            <button id="amazon-rates" type="button" title="Find" class="button">
+                <span>
+                    <span>Find</span>
+                </span>
+            </button>
+            <div id="amazon-fba-container">
+            </div>
+        </div>
+    </div>
+<?php endif; ?>

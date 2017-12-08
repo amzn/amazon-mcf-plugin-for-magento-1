@@ -1,0 +1,357 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <amazon_mcf translate="label" module="amazon_mcf">
+            <label>Amazon Multi-Channel Fulfillment</label>
+            <tab>sales</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>200</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <credentials translate="label" module="amazon_mcf">
+                    <label>Connect Your Store</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+
+                        <enable translate="label">
+                            <label>Enable Multi-Channel Fulfillment</label>
+                            <sort_order>1</sort_order>
+                            <comment><![CDATA[If this is disabled no orders will be submitted to Amazon]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable>
+
+                        <marketplace translate="label">
+                            <label>Marketplace</label>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>select</frontend_type>
+                            <source_model>amazon_mcf/system_config_source_dropdown_marketplaces</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </marketplace>
+
+                        <marketplace_custom translate="label">
+                            <label>Custom Marketplace</label>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <marketplace>custom</marketplace>
+                            </depends>
+                            <comment><![CDATA[Retrieve by your region/marketplace from <a href="http://docs.developer.amazonservices.com/en_US/dev_guide/DG_Endpoints.html" target="_blank">Amazon Docs</a>. Enter both MarketplaceId and Endpoint separated by a semicolon, e.g. "ATVPDKIKX0DER;https://mws.amazonservices.com" ]]></comment>
+                        </marketplace_custom>
+
+                        <seller_id translate="label">
+                            <label>Seller ID</label>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </seller_id>
+
+                        <access_key_id translate="label">
+                            <label>AWS Access Key ID</label>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </access_key_id>
+
+                        <secret_access_key translate="label">
+                            <label>Secret Access Key</label>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secret_access_key>
+
+                        <!--<client_id translate="label">
+                            <label>Developer ID</label>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </client_id>
+
+                        <client_secret translate="label">
+                            <label>MWS Auth Token</label>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </client_secret>-->
+
+                        <validate_credentials translate="label">
+                            <label>Validate Credentials</label>
+                            <frontend_model>amazon_mcf/adminhtml_system_config_button_credentials</frontend_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </validate_credentials>
+                    </fields>
+                </credentials>
+                <onsite_delivery_options>
+                    <label>On-Site Delivery Estimator</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <comment>
+                        <![CDATA[
+                            <strong>Note:</strong> To enable Amazon Multi-Channel Fulfillment shipping speeds and <br />
+                            rates for your customers at cart & checkout, please enable the shipping method in <br />
+                            the <strong>Sales > Shipping Methods > Amazon MCF Shipping</strong> section.
+                        ]]>
+                    </comment>
+                    <fields>
+                        <display_estimated_arrival translate="label">
+                            <label>Include Delivery Date Estimates On Cart and Checkout</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Requires use of Amazon shipping method]]></comment>
+                        </display_estimated_arrival>
+
+                        <enable_delivery_estimator_pdp translate="label">
+                            <label>Display Delivery Date Estimator on Product Detail Page</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Dependent on store theme]]></comment>
+                        </enable_delivery_estimator_pdp>
+
+                        <use_amazon_shipping_fees translate="label">
+                            <label>Charge Customers Your Amazon Fee In Shipping Costs</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Whether to pass through fulfillment costs, if not enabled will only use the Default Shipping Cost and Standard speed]]></comment>
+                        </use_amazon_shipping_fees>
+
+                        <default_standard_shipping_cost translate="label">
+                            <label>Default Standard Shipping Cost</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Used as the standard shipping method cost if configured or unable to fetch realtime rates from Amazon]]></comment>
+                        </default_standard_shipping_cost>
+
+                        <default_expedited_shipping_cost translate="label">
+                            <label>Default Expedited Shipping Cost</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Used as the expedited shipping method cost if configured or unable to fetch realtime rates from Amazon]]></comment>
+                        </default_expedited_shipping_cost>
+
+                        <default_priority_shipping_cost translate="label">
+                            <label>Default Priority Shipping Cost (when applicable)</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <depends><enable>1</enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Used as the priority shipping method cost if configured or unable to fetch realtime rates from Amazon. Dependent on Marketplace and destination.]]></comment>
+                        </default_priority_shipping_cost>
+                    </fields>
+                </onsite_delivery_options>
+                <options>
+                    <label>Delivery Options</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+
+                        <note_to_enable translate="label">
+                            <label>Enable module to configure</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>0</value></enable></depends>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </note_to_enable>
+
+                        <send_amazon_ship_confirmation translate="label">
+                            <label>Send Amazon Ship Confirmation</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>160</sort_order>
+                            <comment><![CDATA[Send Amazon's Shipping email in addition to the Magento one]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </send_amazon_ship_confirmation>
+
+                        <amazon_packing_slip_comment translate="label">
+                            <label>Amazon Packing Slip Comment</label>
+                            <depends><enable><fieldset>credentials</fieldset><value>1</value></enable></depends>
+                            <comment><![CDATA[If filled in, will pass through as a general comment on all orders. Limited to 1000 characters.]]></comment>
+                            <validate>validate-length maximum-length-1000</validate>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </amazon_packing_slip_comment>
+                    </fields>
+
+                </options>
+
+                <developer>
+                    <label>Developer Options</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <debug translate="label">
+                            <label>Debug Mode</label>
+                            <sort_order>10</sort_order>
+                            <comment><![CDATA[No requests will be sent to Amazon, canned responses will be used]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </debug>
+                        <log_api translate="label">
+                            <label>Log API Request/Response</label>
+                            <sort_order>20</sort_order>
+                            <comment><![CDATA[API request and response details will be logged to var/log/amzn_api.log]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </log_api>
+                        <log_order_inventory_processing translate="label">
+                            <label>Log Order and Inventory Processing</label>
+                            <sort_order>30</sort_order>
+                            <comment><![CDATA[Order and inventory update details will be logged to var/log/amzn_order_inventory.log]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </log_order_inventory_processing>
+                        <start_inventory_sync translate="label">
+                            <label>Sync Inventory</label>
+                            <frontend_model>amazon_mcf/adminhtml_system_config_button</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Inventory sync will happen over time in the background]]></comment>
+                        </start_inventory_sync>
+                    </fields>
+                </developer>
+            </groups>
+        </amazon_mcf>
+        <carriers translate="label" module="shipping">
+            <groups>
+                <amazon_mcf_carrier>
+                    <label>Amazon MCF Shipping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>2</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <sallowspecific translate="label">
+                            <label>Ship to Applicable Countries</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>90</sort_order>
+                            <frontend_class>shipping-applicable-country</frontend_class>
+                            <source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sallowspecific>
+                        <specificcountry translate="label">
+                            <label>Ship to Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>91</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </specificcountry>
+                    </fields>
+                </amazon_mcf_carrier>
+            </groups>
+        </carriers>
+    </sections>
+</config>
