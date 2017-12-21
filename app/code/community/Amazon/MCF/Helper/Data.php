@@ -17,7 +17,7 @@
 
 class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
 
-    const CONFIG_APPLICATION_NAME = 'Amazon MCF Magento Connector';
+    const CONFIG_APPLICATION_NAME = 'Amazon MCF Magento 1 Connector';
     const CONFIG_APPLICATION_VERSION = '0.1.0';
 
     /**

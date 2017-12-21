@@ -25,7 +25,9 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
     protected $carriers = array(
         'USPS' => array('carrier_code' => 'usps', 'title' => 'United States Postal Service'),
         'UPS'  => array('carrier_code' => 'ups', 'title' => 'United Parcel Service'),
-        'UPSM' => array('carrier_code' => 'ups', 'title' => 'United Parcel Service')
+        'UPSM' => array('carrier_code' => 'ups', 'title' => 'United Parcel Service'),
+        'DHL' => ['carrier_code' => 'dhl', 'title' => 'DHL'],
+        'FEDEX' => ['carrier_code' => 'fedex', 'title' => 'Federal Express'],
     );
 
     /**

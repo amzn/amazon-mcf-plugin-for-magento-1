@@ -125,6 +125,33 @@ class Amazon_MCF_Model_Carrier_Amazon
             }
         }
 
+        // check for non-FBA items in cart and prevent Amazon rates from being offered.
+        $isFBA = FALSE;
+        $nonFBA = FALSE;
+
+        $items = $request->getAllItems();
+        if ($items) {
+            foreach ($items as $item) {
+
+                if ($item->getProduct()->getAmazonMcfEnabled()) {
+                    $isFBA = TRUE;
+                }
+                else {
+                    $nonFBA = TRUE;
+                }
+            }
+
+
+            if (!$rates && $isFBA && !$nonFBA) {
+                $rates = array('Standard' => array('price' => $helper->getDefaultStandardShippingCost($request->getStoreId())));
+            }
+
+            // if any non-fba items are in cart, offer no rates
+            if ($nonFBA) {
+                $rates = array();
+            }
+        }
+
         return $rates;
     }
 

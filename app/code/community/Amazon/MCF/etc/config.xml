@@ -15,6 +15,7 @@
             <adminhtml>
                 <rewrite>
                     <catalog_product_grid>Amazon_MCF_Block_Catalog_Product_Grid</catalog_product_grid>
+                    <sales_order_shipment_create_items>Amazon_MCF_Block_Sales_Order_Shipment_Create_Items</sales_order_shipment_create_items>
                 </rewrite>
             </adminhtml>
         </blocks>
@@ -37,13 +38,13 @@
         </models>
 
         <!--<template>-->
-            <!--<email>-->
-                <!--<system_cron_error_email_template translate="label" module="amazon_mcf">-->
-                    <!--<label>Cron error</label>-->
-                    <!--<file>amazon_mcf/cron_error.html</file>-->
-                    <!--<type>text</type>-->
-                <!--</system_cron_error_email_template>-->
-            <!--</email>-->
+        <!--<email>-->
+        <!--<system_cron_error_email_template translate="label" module="amazon_mcf">-->
+        <!--<label>Cron error</label>-->
+        <!--<file>amazon_mcf/cron_error.html</file>-->
+        <!--<type>text</type>-->
+        <!--</system_cron_error_email_template>-->
+        <!--</email>-->
         <!--</template>-->
 
         <resources>
@@ -126,6 +127,16 @@
         </layout>
     </frontend>
 
+    <adminhtml>
+        <layout>
+            <updates>
+                <amazon_mcf>
+                    <file>amazon_mcf.xml</file>
+                </amazon_mcf>
+            </updates>
+        </layout>
+    </adminhtml>
+
     <admin>
         <routers>
             <adminhtml>
@@ -137,6 +148,8 @@
             </adminhtml>
         </routers>
     </admin>
+
+
 
     <crontab>
         <jobs>

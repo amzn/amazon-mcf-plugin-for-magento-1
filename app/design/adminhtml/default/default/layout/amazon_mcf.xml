@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_sales_order_shipment_new>
+        <reference name="order_items">
+            <action method="setTemplate"><template>amazon/sales/order/shipment/create/items.phtml</template></action>
+        </reference>
+    </adminhtml_sales_order_shipment_new>
+</layout>
