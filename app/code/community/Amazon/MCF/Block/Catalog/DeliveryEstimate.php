@@ -15,11 +15,18 @@
  * permissions and limitations under the License.
  */
 
+/**
+ * Class Amazon_MCF_Block_Catalog_DeliveryEstimate
+ */
 class Amazon_MCF_Block_Catalog_DeliveryEstimate extends Mage_Core_Block_Template
 {
     protected $product;
 
-    public function _construct() {
+    /**
+     *
+     */
+    public function _construct() 
+    {
         parent::_construct();
 
         $this->product = Mage::registry('current_product');
@@ -31,18 +38,24 @@ class Amazon_MCF_Block_Catalog_DeliveryEstimate extends Mage_Core_Block_Template
      *
      * @return bool
      */
-    public function isFBAEnabled() {
+    public function isFBAEnabled() 
+    {
         $helper = Mage::helper('amazon_mcf');
         $enabled = false;
-        if ($helper->getDisplayDeliveryEstimatorPdp() &&
-            $this->product->getAmazonMcfEnabled()) {
+        if ($helper->getDisplayDeliveryEstimatorPdp() 
+            && $this->product->getAmazonMcfEnabled()
+        ) {
             $enabled = true;
         }
 
         return $enabled;
     }
 
-    public function getProductId() {
+    /**
+     * @return mixed
+     */
+    public function getProductId() 
+    {
         return $this->product->getId();
     }
 }

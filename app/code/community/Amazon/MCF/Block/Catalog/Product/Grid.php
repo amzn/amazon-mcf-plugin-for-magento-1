@@ -15,9 +15,16 @@
  * permissions and limitations under the License.
  */
 
-class Amazon_MCF_Block_Catalog_Product_Grid extends Mage_Adminhtml_Block_Catalog_Product_Grid
+/**
+ * Class Amazon_MCF_Block_Catalog_Product_Grid
+ */
+class Amazon_MCF_Block_Catalog_Product_Grid
+    extends Mage_Adminhtml_Block_Catalog_Product_Grid
 {
 
+    /**
+     * @inheritdoc
+     */
     protected function _prepareCollection()
     {
         $store = $this->_getStore();
@@ -28,13 +35,16 @@ class Amazon_MCF_Block_Catalog_Product_Grid extends Mage_Adminhtml_Block_Catalog
             ->addAttributeToSelect('type_id')
             ->addAttributeToSelect('amazon_mcf_enabled');
 
-        if (Mage::helper('catalog')->isModuleEnabled('Mage_CatalogInventory')) {
-            $collection->joinField('qty',
+        if (Mage::helper('catalog')->isModuleEnabled('Mage_CatalogInventory')
+        ) {
+            $collection->joinField(
+                'qty',
                 'cataloginventory/stock_item',
                 'qty',
                 'product_id=entity_id',
                 '{{table}}.stock_id=1',
-                'left');
+                'left'
+            );
         }
         if ($store->getId()) {
             //$collection->setStoreId($store->getId());
@@ -80,11 +90,22 @@ class Amazon_MCF_Block_Catalog_Product_Grid extends Mage_Adminhtml_Block_Catalog
                 'left',
                 $store->getId()
             );
-        }
-        else {
+        } else {
             $collection->addAttributeToSelect('price');
-            $collection->joinAttribute('status', 'catalog_product/status', 'entity_id', null, 'inner');
-            $collection->joinAttribute('visibility', 'catalog_product/visibility', 'entity_id', null, 'inner');
+            $collection->joinAttribute(
+                'status',
+                'catalog_product/status',
+                'entity_id',
+                null,
+                'inner'
+            );
+            $collection->joinAttribute(
+                'visibility',
+                'catalog_product/visibility',
+                'entity_id',
+                null,
+                'inner'
+            );
         }
 
         $this->setCollection($collection);
@@ -94,185 +115,248 @@ class Amazon_MCF_Block_Catalog_Product_Grid extends Mage_Adminhtml_Block_Catalog
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function _prepareColumns()
     {
-        $this->addColumn('entity_id',
+        $this->addColumn(
+            'entity_id',
             array(
-                'header'=> Mage::helper('catalog')->__('ID'),
+                'header' => Mage::helper('catalog')->__('ID'),
                 'width' => '50px',
-                'type'  => 'number',
+                'type' => 'number',
                 'index' => 'entity_id',
-        ));
-        $this->addColumn('name',
+            )
+        );
+        $this->addColumn(
+            'name',
             array(
-                'header'=> Mage::helper('catalog')->__('Name'),
+                'header' => Mage::helper('catalog')->__('Name'),
                 'index' => 'name',
-        ));
+            )
+        );
 
         $store = $this->_getStore();
         if ($store->getId()) {
-            $this->addColumn('custom_name',
+            $this->addColumn(
+                'custom_name',
                 array(
-                    'header'=> Mage::helper('catalog')->__('Name in %s', $store->getName()),
+                    'header' => Mage::helper('catalog')
+                        ->__('Name in %s', $store->getName()),
                     'index' => 'custom_name',
-            ));
+                )
+            );
         }
 
-        $this->addColumn('type',
+        $this->addColumn(
+            'type',
             array(
-                'header'=> Mage::helper('catalog')->__('Type'),
+                'header' => Mage::helper('catalog')->__('Type'),
                 'width' => '60px',
                 'index' => 'type_id',
-                'type'  => 'options',
-                'options' => Mage::getSingleton('catalog/product_type')->getOptionArray(),
-        ));
+                'type' => 'options',
+                'options' => Mage::getSingleton('catalog/product_type')
+                    ->getOptionArray(),
+            )
+        );
 
         $sets = Mage::getResourceModel('eav/entity_attribute_set_collection')
-            ->setEntityTypeFilter(Mage::getModel('catalog/product')->getResource()->getTypeId())
+            ->setEntityTypeFilter(
+                Mage::getModel('catalog/product')
+                ->getResource()->getTypeId()
+            )
             ->load()
             ->toOptionHash();
 
-        $this->addColumn('set_name',
+        $this->addColumn(
+            'set_name',
             array(
-                'header'=> Mage::helper('catalog')->__('Attrib. Set Name'),
+                'header' => Mage::helper('catalog')->__('Attrib. Set Name'),
                 'width' => '100px',
                 'index' => 'attribute_set_id',
-                'type'  => 'options',
+                'type' => 'options',
                 'options' => $sets,
-        ));
+            )
+        );
 
-        $this->addColumn('sku',
+        $this->addColumn(
+            'sku',
             array(
-                'header'=> Mage::helper('catalog')->__('SKU'),
+                'header' => Mage::helper('catalog')->__('SKU'),
                 'width' => '80px',
                 'index' => 'sku',
-        ));
+            )
+        );
 
         $store = $this->_getStore();
-        $this->addColumn('price',
+        $this->addColumn(
+            'price',
             array(
-                'header'=> Mage::helper('catalog')->__('Price'),
-                'type'  => 'price',
+                'header' => Mage::helper('catalog')->__('Price'),
+                'type' => 'price',
                 'currency_code' => $store->getBaseCurrency()->getCode(),
                 'index' => 'price',
-        ));
+            )
+        );
 
-        if (Mage::helper('catalog')->isModuleEnabled('Mage_CatalogInventory')) {
-            $this->addColumn('qty',
+        if (Mage::helper('catalog')->isModuleEnabled('Mage_CatalogInventory')
+        ) {
+            $this->addColumn(
+                'qty',
                 array(
-                    'header'=> Mage::helper('catalog')->__('Qty'),
+                    'header' => Mage::helper('catalog')->__('Qty'),
                     'width' => '100px',
-                    'type'  => 'number',
+                    'type' => 'number',
                     'index' => 'qty',
-            ));
+                )
+            );
         }
 
-        $this->addColumn('visibility',
+        $this->addColumn(
+            'visibility',
             array(
-                'header'=> Mage::helper('catalog')->__('Visibility'),
+                'header' => Mage::helper('catalog')->__('Visibility'),
                 'width' => '70px',
                 'index' => 'visibility',
-                'type'  => 'options',
-                'options' => Mage::getModel('catalog/product_visibility')->getOptionArray(),
-        ));
+                'type' => 'options',
+                'options' => Mage::getModel('catalog/product_visibility')
+                    ->getOptionArray(),
+            )
+        );
 
-        $this->addColumn('status',
+        $this->addColumn(
+            'status',
             array(
-                'header'=> Mage::helper('catalog')->__('Status'),
+                'header' => Mage::helper('catalog')->__('Status'),
                 'width' => '70px',
                 'index' => 'status',
-                'type'  => 'options',
-                'options' => Mage::getSingleton('catalog/product_status')->getOptionArray(),
-        ));
+                'type' => 'options',
+                'options' => Mage::getSingleton('catalog/product_status')
+                    ->getOptionArray(),
+            )
+        );
 
-        $this->addColumn('amazon_mcf_enabled',
+        $this->addColumn(
+            'amazon_mcf_enabled',
             array(
-                'header'=> Mage::helper('catalog')->__('Fulfilled By Amazon'),
+                'header' => Mage::helper('catalog')->__('Fulfilled By Amazon'),
                 'width' => '70px',
                 'index' => 'amazon_mcf_enabled',
-                'type'  => 'options',
-                'options'   => array(
-                    1  => Mage::helper('sales')->__('Yes'),
-                    0  => Mage::helper('sales')->__('No'),
+                'type' => 'options',
+                'options' => array(
+                    1 => Mage::helper('sales')->__('Yes'),
+                    0 => Mage::helper('sales')->__('No'),
                 )
-        ));
+            )
+        );
 
         if (!Mage::app()->isSingleStoreMode()) {
-            $this->addColumn('websites',
+            $this->addColumn(
+                'websites',
                 array(
-                    'header'=> Mage::helper('catalog')->__('Websites'),
+                    'header' => Mage::helper('catalog')->__('Websites'),
                     'width' => '100px',
-                    'sortable'  => false,
-                    'index'     => 'websites',
-                    'type'      => 'options',
-                    'options'   => Mage::getModel('core/website')->getCollection()->toOptionHash(),
-            ));
+                    'sortable' => false,
+                    'index' => 'websites',
+                    'type' => 'options',
+                    'options' => Mage::getModel('core/website')
+                        ->getCollection()->toOptionHash(),
+                )
+            );
         }
 
-        $this->addColumn('action',
+        $this->addColumn(
+            'action',
             array(
-                'header'    => Mage::helper('catalog')->__('Action'),
-                'width'     => '50px',
-                'type'      => 'action',
-                'getter'     => 'getId',
-                'actions'   => array(
+                'header' => Mage::helper('catalog')->__('Action'),
+                'width' => '50px',
+                'type' => 'action',
+                'getter' => 'getId',
+                'actions' => array(
                     array(
                         'caption' => Mage::helper('catalog')->__('Edit'),
-                        'url'     => array(
-                            'base'=>'*/*/edit',
-                            'params'=>array('store'=>$this->getRequest()->getParam('store'))
+                        'url' => array(
+                            'base' => '*/*/edit',
+                            'params' => array(
+                                'store' => $this->getRequest()->getParam('store')
+                            )
                         ),
-                        'field'   => 'id'
+                        'field' => 'id'
                     )
                 ),
-                'filter'    => false,
-                'sortable'  => false,
-                'index'     => 'stores',
-        ));
+                'filter' => false,
+                'sortable' => false,
+                'index' => 'stores',
+            )
+        );
 
         if (Mage::helper('catalog')->isModuleEnabled('Mage_Rss')) {
-            $this->addRssList('rss/catalog/notifystock', Mage::helper('catalog')->__('Notify Low Stock RSS'));
+            $this->addRssList(
+                'rss/catalog/notifystock',
+                Mage::helper('catalog')->__('Notify Low Stock RSS')
+            );
         }
 
         return Mage_Adminhtml_Block_Widget_Grid::_prepareColumns();
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function _prepareMassaction()
     {
         $this->setMassactionIdField('entity_id');
         $this->getMassactionBlock()->setFormFieldName('product');
 
-        $this->getMassactionBlock()->addItem('delete', array(
-             'label'=> Mage::helper('catalog')->__('Delete'),
-             'url'  => $this->getUrl('*/*/massDelete'),
-             'confirm' => Mage::helper('catalog')->__('Are you sure?')
-        ));
+        $this->getMassactionBlock()->addItem(
+            'delete', array(
+                'label' => Mage::helper('catalog')->__('Delete'),
+                'url' => $this->getUrl('*/*/massDelete'),
+                'confirm' => Mage::helper('catalog')->__('Are you sure?')
+            )
+        );
 
-        $statuses = Mage::getSingleton('catalog/product_status')->getOptionArray();
+        $statuses = Mage::getSingleton('catalog/product_status')
+            ->getOptionArray();
 
-        array_unshift($statuses, array('label'=>'', 'value'=>''));
-        $this->getMassactionBlock()->addItem('status', array(
-             'label'=> Mage::helper('catalog')->__('Change status'),
-             'url'  => $this->getUrl('*/*/massStatus', array('_current'=>true)),
-             'additional' => array(
+        array_unshift($statuses, array('label' => '', 'value' => ''));
+        $this->getMassactionBlock()->addItem(
+            'status', array(
+                'label' => Mage::helper('catalog')->__('Change status'),
+                'url' => $this->getUrl(
+                    '*/*/massStatus',
+                    array('_current' => true)
+                ),
+                'additional' => array(
                     'visibility' => array(
-                         'name' => 'status',
-                         'type' => 'select',
-                         'class' => 'required-entry',
-                         'label' => Mage::helper('catalog')->__('Status'),
-                         'values' => $statuses
-                     )
-             )
-        ));
+                        'name' => 'status',
+                        'type' => 'select',
+                        'class' => 'required-entry',
+                        'label' => Mage::helper('catalog')->__('Status'),
+                        'values' => $statuses
+                    )
+                )
+            )
+        );
 
-        if (Mage::getSingleton('admin/session')->isAllowed('catalog/update_attributes')){
-            $this->getMassactionBlock()->addItem('attributes', array(
-                'label' => Mage::helper('catalog')->__('Update Attributes'),
-                'url'   => $this->getUrl('*/catalog_product_action_attribute/edit', array('_current'=>true))
-            ));
+        if (Mage::getSingleton('admin/session')->isAllowed('catalog/update_attributes')
+        ) {
+            $this->getMassactionBlock()->addItem(
+                'attributes', array(
+                    'label' => Mage::helper('catalog')->__('Update Attributes'),
+                    'url' => $this->getUrl(
+                        '*/catalog_product_action_attribute/edit',
+                        array('_current' => true)
+                    )
+                )
+            );
         }
 
-        Mage::dispatchEvent('adminhtml_catalog_product_grid_prepare_massaction', array('block' => $this));
+        Mage::dispatchEvent(
+            'adminhtml_catalog_product_grid_prepare_massaction',
+            array('block' => $this)
+        );
         return $this;
     }
 }

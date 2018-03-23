@@ -15,7 +15,11 @@
  * permissions and limitations under the License.
  */
 
-class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
+/**
+ * Class Amazon_MCF_Helper_Data
+ */
+class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract
+{
 
     const CONFIG_APPLICATION_NAME = 'Amazon MCF Magento 1 Connector';
     const CONFIG_APPLICATION_VERSION = '0.1.0';
@@ -27,23 +31,33 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
     const CONFIG_PATH_DEBUG = 'amazon_mcf/developer/debug';
     const CONFIG_PATH_ENDPOINT = 'amazon_mcf/credentials/marketplace_endpoint';
     const CONFIG_PATH_MARKETPLACE = 'amazon_mcf/credentials/marketplace';
-    const CONFIG_PATH_MARKETPLACE_CUSTOM = 'amazon_mcf/credentials/marketplace_custom';
+    const CONFIG_PATH_MARKETPLACE_CUSTOM
+        = 'amazon_mcf/credentials/marketplace_custom';
     const CONFIG_PATH_SELLER_ID = 'amazon_mcf/credentials/seller_id';
     const CONFIG_PATH_ACCESS_KEY_ID = 'amazon_mcf/credentials/access_key_id';
     const CONFIG_PATH_SECRET_ACCESS_KEY = 'amazon_mcf/credentials/secret_access_key';
     const CONFIG_PATH_CLIENT_ID = 'amazon_mcf/credentials/client_id';
     const CONFIG_PATH_CLIENT_SECRET = 'amazon_mcf/credentials/client_secret';
     const CONFIG_PATH_TITLE = 'amazon_mcf/options/title';
-    const CONFIG_PATH_SEND_AMAZON_SHIP_CONFIRMATION = 'amazon_mcf/options/send_amazon_ship_confirmation';
-    const CONFIG_PATH_DISPLAY_ESTIMATED_ARRIVAL = 'amazon_mcf/onsite_delivery_options/display_estimated_arrival';
-    const CONFIG_PATH_DISPLAY_DELIVERY_ESTIMATOR_PDP = 'amazon_mcf/onsite_delivery_options/enable_delivery_estimator_pdp';
-    const CONFIG_PATH_DEFAULT_STANDARD_SHIPPING_COST = 'amazon_mcf/onsite_delivery_options/default_standard_shipping_cost';
-    const CONFIG_PATH_DEFAULT_EXPEDITED_SHIPPING_COST = 'amazon_mcf/onsite_delivery_options/default_expedited_shipping_cost';
-    const CONFIG_PATH_DEFAULT_PRIORITY_SHIPPING_COST = 'amazon_mcf/onsite_delivery_options/default_priority_shipping_cost';
-    const CONFIG_PATH_USE_AMAZON_SHIPPING_FEES = 'amazon_mcf/onsite_delivery_options/use_amazon_shipping_fees';
-    const CONFIG_PATH_PACKING_SLIP_COMMENT = 'amazon_mcf/options/amazon_packing_slip_comment';
+    const CONFIG_PATH_SEND_AMAZON_SHIP_CONFIRMATION
+        = 'amazon_mcf/options/send_amazon_ship_confirmation';
+    const CONFIG_PATH_DISPLAY_ESTIMATED_ARRIVAL
+        = 'amazon_mcf/onsite_delivery_options/display_estimated_arrival';
+    const CONFIG_PATH_DISPLAY_DELIVERY_ESTIMATOR_PDP
+        = 'amazon_mcf/onsite_delivery_options/enable_delivery_estimator_pdp';
+    const CONFIG_PATH_DEFAULT_STANDARD_SHIPPING_COST
+        = 'amazon_mcf/onsite_delivery_options/default_standard_shipping_cost';
+    const CONFIG_PATH_DEFAULT_EXPEDITED_SHIPPING_COST
+        = 'amazon_mcf/onsite_delivery_options/default_expedited_shipping_cost';
+    const CONFIG_PATH_DEFAULT_PRIORITY_SHIPPING_COST
+        = 'amazon_mcf/onsite_delivery_options/default_priority_shipping_cost';
+    const CONFIG_PATH_USE_AMAZON_SHIPPING_FEES
+        = 'amazon_mcf/onsite_delivery_options/use_amazon_shipping_fees';
+    const CONFIG_PATH_PACKING_SLIP_COMMENT
+        = 'amazon_mcf/options/amazon_packing_slip_comment';
     const CONFIG_PATH_LOG_API_REQUEST_RESPONSE = 'amazon_mcf/developer/log_api';
-    const CONFIG_PATH_LOG_ORDER_INVENTORY_PROCESSING = 'amazon_mcf/developer/log_order_inventory_processing';
+    const CONFIG_PATH_LOG_ORDER_INVENTORY_PROCESSING
+        = 'amazon_mcf/developer/log_order_inventory_processing';
     const CONFIG_PATH_AMAZON_CARRIER_ENABLED = 'carriers/amazon_mcf_carrier/active';
 
     /**
@@ -115,14 +129,32 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
         'CN' => 'AAHKV2X7AFYLW',
     );
 
-    public function getApplicationName() {
+    /**
+     * Retrieve application name
+     *
+     * @return string
+     */
+    public function getApplicationName()
+    {
         return self::CONFIG_APPLICATION_NAME;
     }
 
-    public function getApplicationVersion() {
+    /**
+     * Retrieve application version
+     *
+     * @return string
+     */
+    public function getApplicationVersion()
+    {
         return self::CONFIG_APPLICATION_VERSION;
     }
 
+    /**
+     * Get country endpoint URL based on country code
+     *
+     * @param  $countryCode
+     * @return mixed|string
+     */
     public function getEndpointForCountry($countryCode)
     {
         $endpoint = 'https://mws.amazonservices.com';
@@ -137,48 +169,97 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
     /**
      * Checks if Multi Channel Fulfillment is enabled and sufficiently configured
      *
-     * @param null $store
-     * @return bool Whether or not to use MCF
+     * @param  null $store
+     * @return bool
      */
-    public function isEnabled($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_ENABLED, $store) && $this->_verifyConfig($store);
+    public function isEnabled($store = null)
+    {
+        return Mage::getStoreConfig(self::CONFIG_PATH_ENABLED, $store)
+            && $this->verifyConfig($store);
     }
 
-    public function isDebug($store = null) {
+    /**
+     * Retrieves debug setting
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function isDebug($store = null)
+    {
         return Mage::getStoreConfig(self::CONFIG_PATH_DEBUG, $store);
     }
 
-    public function getEndpoint($store = null) {
+    /**
+     * Retrieve endpoint for store setting
+     *
+     * @param  null $store
+     * @return mixed|string
+     */
+    public function getEndpoint($store = null)
+    {
         $marketplace = $this->getMarketplace();
 
         if ($marketplace == 'custom') {
-            list($marketplaceId, $endpoint) = explode(';', $this->getMarketplaceCustom($store));
+            list($marketplaceId, $endpoint)
+                = explode(';', $this->getMarketplaceCustom($store));
             return $endpoint;
         }
 
         return $this->getEndpointForCountry($this->getMarketplace());
     }
 
-    public function getMarketplace($store = null) {
+    /**
+     * Retrieve marketplace for store setting
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getMarketplace($store = null)
+    {
         return Mage::getStoreConfig(self::CONFIG_PATH_MARKETPLACE, $store);
     }
 
-    public function getMarketplaceCustom($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_MARKETPLACE_CUSTOM, $store);
+    /**
+     * Retrieves custom marketplace
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getMarketplaceCustom($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_MARKETPLACE_CUSTOM,
+            $store
+        );
     }
 
-    public function getMarketplaceId($store = null) {
+    /**
+     * Retrieve store marketplace ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getMarketplaceId($store = null)
+    {
         $marketplace = $this->getMarketplace();
 
         if ($marketplace == 'custom') {
-            list($marketplaceId, $endpoint) = explode(';', $this->getMarketplaceCustom($store));
+            list($marketplaceId, $endpoint)
+                = explode(';', $this->getMarketplaceCustom($store));
             return $marketplaceId;
         }
 
         return $this->marketplaceIds[$marketplace];
     }
 
-    public function getMarketplaceIdForCountry($countryCode) {
+    /**
+     * Get marketplace ID by country code
+     *
+     * @param  $countryCode
+     * @return mixed|string
+     */
+    public function getMarketplaceIdForCountry($countryCode)
+    {
         $marketplaceId = 'ATVPDKIKX0DER';
 
         if (isset($this->marketplaceIds[$countryCode])) {
@@ -188,120 +269,320 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
         return $marketplaceId;
     }
 
-    public function getSellerId($store = null) {
+    /**
+     * Get seller ID by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getSellerId($store = null)
+    {
         return Mage::getStoreConfig(self::CONFIG_PATH_SELLER_ID, $store);
     }
 
-    public function getAccessKeyId($store = null) {
-        return Mage::helper('core')->decrypt(Mage::getStoreConfig(self::CONFIG_PATH_ACCESS_KEY_ID, $store));
+    /**
+     * Retrieve access key by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getAccessKeyId($store = null)
+    {
+        return Mage::helper('core')
+            ->decrypt(
+                Mage::getStoreConfig(self::CONFIG_PATH_ACCESS_KEY_ID, $store)
+            );
     }
 
-    public function getSecretAccessKey($store = null) {
-        return Mage::helper('core')->decrypt(Mage::getStoreConfig(self::CONFIG_PATH_SECRET_ACCESS_KEY, $store));
+    /**
+     * Retrieve secret Access ID by store id
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getSecretAccessKey($store = null)
+    {
+        return Mage::helper('core')
+            ->decrypt(
+                Mage::getStoreConfig(
+                    self::CONFIG_PATH_SECRET_ACCESS_KEY,
+                    $store
+                )
+            );
     }
 
-    public function getClientId($store = null) {
+    /**
+     * Get client ID by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getClientId($store = null)
+    {
         return Mage::getStoreConfig(self::CONFIG_PATH_CLIENT_ID, $store);
     }
 
-    public function getClientSecret($store = null) {
+    /**
+     * Get client secret ID by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getClientSecret($store = null)
+    {
         return Mage::getStoreConfig(self::CONFIG_PATH_CLIENT_SECRET, $store);
     }
 
-    public function getDisplayEstimatedArrival($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_DISPLAY_ESTIMATED_ARRIVAL, $store);
+    /**
+     * Retrieves estimate display setting by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getDisplayEstimatedArrival($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_DISPLAY_ESTIMATED_ARRIVAL, $store
+        );
     }
 
-    public function getDisplayDeliveryEstimatorPdp($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_DISPLAY_DELIVERY_ESTIMATOR_PDP, $store);
+    /**
+     * Retrieves delivery estimate settings by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getDisplayDeliveryEstimatorPdp($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_DISPLAY_DELIVERY_ESTIMATOR_PDP, $store
+        );
     }
 
-    public function getUseAmazonShippingFees($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_USE_AMAZON_SHIPPING_FEES, $store);
+    /**
+     * Retrieve amazon shipping fee setting by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getUseAmazonShippingFees($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_USE_AMAZON_SHIPPING_FEES, $store
+        );
     }
 
-    public function getDefaultStandardShippingCost($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_DEFAULT_STANDARD_SHIPPING_COST, $store);
+    /**
+     * Retrieve default shipping cost setting by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getDefaultStandardShippingCost($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_DEFAULT_STANDARD_SHIPPING_COST, $store
+        );
     }
 
-    public function getDefaultExpeditedShippingCost($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_DEFAULT_EXPEDITED_SHIPPING_COST, $store);
+    /**
+     * Retrieve default expedited shipping cost setting by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getDefaultExpeditedShippingCost($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_DEFAULT_EXPEDITED_SHIPPING_COST, $store
+        );
     }
 
-    public function getDefaultPriorityShippingCost($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_DEFAULT_PRIORITY_SHIPPING_COST, $store);
+    /**
+     * Retrieve default priority shipping cost setting by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getDefaultPriorityShippingCost($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_DEFAULT_PRIORITY_SHIPPING_COST, $store
+        );
     }
 
-    public function getLogApi($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_LOG_API_REQUEST_RESPONSE, $store);
+    /**
+     * Retrieve log API settings via Store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getLogApi($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_LOG_API_REQUEST_RESPONSE, $store
+        );
     }
 
-    public function getLogOrderInventoryProcessing($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_LOG_ORDER_INVENTORY_PROCESSING, $store);
+    /**
+     * Retrieve log order inventory processing setting by store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getLogOrderInventoryProcessing($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_LOG_ORDER_INVENTORY_PROCESSING, $store
+        );
     }
 
-    public function sendShipmentEmail($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_SEND_AMAZON_SHIP_CONFIRMATION, $store);
+    /**
+     * Retrieve shipment email settings via store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function sendShipmentEmail($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_SEND_AMAZON_SHIP_CONFIRMATION, $store
+        );
     }
 
-    public function getPackingSlipComment($store = null) {
-        $comment = Mage::getStoreConfig(self::CONFIG_PATH_PACKING_SLIP_COMMENT, $store);
+    /**
+     * Retrieve packing slip comment by store ID
+     *
+     * @param  null $store
+     * @return mixed|string
+     */
+    public function getPackingSlipComment($store = null)
+    {
+        $comment = Mage::getStoreConfig(
+            self::CONFIG_PATH_PACKING_SLIP_COMMENT, $store
+        );
         if (empty($comment)) {
             $comment = 'Thank you for your order!';
         }
         return $comment;
     }
 
-    public function getCarrierEnabled($store = null) {
-        return Mage::getStoreConfig(self::CONFIG_PATH_AMAZON_CARRIER_ENABLED, $store);
+    /**
+     * Retrieve carrier enabled setting via store ID
+     *
+     * @param  null $store
+     * @return mixed
+     */
+    public function getCarrierEnabled($store = null)
+    {
+        return Mage::getStoreConfig(
+            self::CONFIG_PATH_AMAZON_CARRIER_ENABLED, $store
+        );
     }
 
     /**
      * Log various types of messages to the respective log files
+     *
+     * @param $string
+     * @param null   $store
      */
-    public function logApi($string, $store = null) {
+    public function logApi($string, $store = null)
+    {
         if ($this->getLogApi($store)) {
             Mage::log($string, null, self::FILE_PATH_LOG_API);
         }
     }
 
-    public function logOrder($string, $store = null) {
+    /**
+     * Log messages to order log
+     *
+     * @param $string
+     * @param null   $store
+     */
+    public function logOrder($string, $store = null)
+    {
         if ($this->getLogOrderInventoryProcessing($store)) {
-            Mage::log('Order Update: ' . $string, null, self::FILE_PATH_LOG_ORDER_INVENTORY);
+            Mage::log(
+                'Order Update: ' . $string,
+                null,
+                self::FILE_PATH_LOG_ORDER_INVENTORY
+            );
         }
     }
 
-    public function logInventory($string, $store = null) {
+    /**
+     * Log messages to inventory log
+     *
+     * @param $string
+     * @param null   $store
+     */
+    public function logInventory($string, $store = null)
+    {
         if ($this->getLogOrderInventoryProcessing($store)) {
-            Mage::log('Inventory Update: ' . $string, NULL, self::FILE_PATH_LOG_ORDER_INVENTORY);
+            Mage::log(
+                'Inventory Update: ' . $string,
+                null,
+                self::FILE_PATH_LOG_ORDER_INVENTORY
+            );
         }
     }
 
-    public function logApiError($method, \FBAOutboundServiceMWS_Exception $e, $store = null) {
+    /**
+     * Log errors
+     *
+     * @param $method
+     * @param FBAOutboundServiceMWS_Exception $e
+     * @param null                            $store
+     */
+    public function logApiError(
+        $method,
+        \FBAOutboundServiceMWS_Exception $e,
+        $store = null
+    ) {
         if ($this->getLogApi($store)) {
-            $this->logApi('Error in ' . $method . ', response: ' . $e->getErrorCode() . ': ' . $e->getErrorMessage() . "\n" . $e->getXML());
+            $this->logApi(
+                'Error in ' . $method . ', response: '
+                . $e->getErrorCode() . ': '
+                . $e->getErrorMessage() . "\n" . $e->getXML()
+            );
         }
     }
 
     /**
      * Used for paging through orders and inventory to avoid long processing
      * delays and request quota limits
+     *
+     * @return mixed
      */
-    public function getInventoryNextToken() {
+    public function getInventoryNextToken()
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_INVENTORY_SYNC_TOKEN);
 
         return $var->getValue('text');
     }
 
-    public function setInventoryNextToken($value = '') {
+    /**
+     * Sets value of next inventory token for future cron job
+     *
+     * @param  string $value
+     * @return mixed
+     */
+    public function setInventoryNextToken($value = '')
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_INVENTORY_SYNC_TOKEN);
 
         return $var->setPlainValue($value)->save();
     }
 
-    public function getInventoryProcessRunning() {
+    /**
+     * Flags inventory process
+     *
+     * @return mixed
+     */
+    public function getInventoryProcessRunning()
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_INVENTORY_SYNC_RUNNING);
 
@@ -313,11 +594,11 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
      * If sync is already running, it does not re-start the sync unless $force
      * is set to true.
      *
-     * @param bool $force
-     *
+     * @param  bool $force
      * @return bool
      */
-    public function startInventorySync($force = false) {
+    public function startInventorySync($force = false)
+    {
         $updated = false;
         $currentRunning = $this->getInventoryProcessRunning();
 
@@ -330,7 +611,13 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
         return $updated;
     }
 
-    public function setInventoryProcessRunning($value = '') {
+    /**
+     * Sets inventory running flag
+     *
+     * @param string $value
+     */
+    public function setInventoryProcessRunning($value = '')
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_INVENTORY_SYNC_RUNNING);
 
@@ -339,7 +626,13 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
         return;
     }
 
-    public function getInventoryProcessPage() {
+    /**
+     * Gets current page of inventory process
+     *
+     * @return int
+     */
+    public function getInventoryProcessPage()
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_INVENTORY_SYNC_PAGE);
 
@@ -354,45 +647,78 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
     /**
      * Collection pages are 1 indexed
      *
-     * @param int $value
+     * @param  int $value
      * @return mixed
      */
-    public function setInventoryProcessPage($value = 1) {
+    public function setInventoryProcessPage($value = 1)
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_INVENTORY_SYNC_PAGE);
 
         return $var->setPlainValue($value)->save();
     }
 
-    public function getOrderNextToken() {
+    /**
+     * Get next order token for cron process
+     *
+     * @return mixed
+     */
+    public function getOrderNextToken()
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_ORDER_SYNC_TOKEN);
 
         return $var->getValue('text');
     }
 
-    public function setOrderNextToken($value = '') {
+    /**
+     * Sets next order token for cron jobs
+     *
+     * @param  string $value
+     * @return mixed
+     */
+    public function setOrderNextToken($value = '')
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_ORDER_SYNC_TOKEN);
 
         return $var->setPlainValue($value)->save();
     }
 
-    public function getOrderProcessRunning() {
+    /**
+     * Checks order process flag status
+     *
+     * @return mixed
+     */
+    public function getOrderProcessRunning()
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_ORDER_SYNC_RUNNING);
 
         return $var->getValue('text');
     }
 
-    public function setOrderProcessRunning($value = '') {
+    /**
+     * Set order processing flag status
+     *
+     * @param  string $value
+     * @return mixed
+     */
+    public function setOrderProcessRunning($value = '')
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_ORDER_SYNC_RUNNING);
 
         return $var->setPlainValue($value)->save();
     }
 
-    public function getOrderProcessPage() {
+    /**
+     * Get current page or order processing
+     *
+     * @return int
+     */
+    public function getOrderProcessPage()
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_ORDER_SYNC_PAGE);
 
@@ -404,7 +730,14 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
         return $value;
     }
 
-    public function setOrderProcessPage($value = 0) {
+    /**
+     * Sets order processing flag
+     *
+     * @param  int $value
+     * @return mixed
+     */
+    public function setOrderProcessPage($value = 0)
+    {
         $var = Mage::getModel('core/variable')
             ->loadByCode(self::CORE_VAR_ORDER_SYNC_PAGE);
 
@@ -414,9 +747,11 @@ class Amazon_MCF_Helper_Data extends Mage_Core_Helper_Abstract {
     /**
      * Verify that config fields have values.
      *
+     * @param  null $store
      * @return bool
      */
-    protected function _verifyConfig($store = null) {
+    protected function verifyConfig($store = null)
+    {
         $endpoint = $this->getEndpoint($store);
         $marketplaceId = $this->getMarketplaceId($store);
         $sellerId = $this->getSellerId($store);

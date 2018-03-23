@@ -14,21 +14,35 @@
  * permissions and limitations under the License.
  */
 
-class Amazon_MCF_Block_Sales_Order_Shipment_Create_Items extends Mage_Adminhtml_Block_Sales_Order_Shipment_Create_Items
+/**
+ * Class Amazon_MCF_Block_Sales_Order_Shipment_Create_Items
+ */
+class Amazon_MCF_Block_Sales_Order_Shipment_Create_Items
+    extends Mage_Adminhtml_Block_Sales_Order_Shipment_Create_Items
 {
 
-    public function FBAEnabled() {
+    /**
+     * @return bool
+     */
+    public function FBAEnabled()
+    {
         $helper = Mage::helper('amazon_mcf');
         return $helper->isEnabled() && $helper->getCarrierEnabled();
     }
 
     /**
      * Prints warning message for use with JavaScript flag.
+     *
      * @return string
      */
-    public function getFBAWarningMessage() {
+    public function getFBAWarningMessage() 
+    {
         if ($this->FBAEnabled()) {
-            return __('This item will be updated as shipped after FBA shipping completed, are you sure you want to manually ship this item in Magento?');
+            return __(
+                'This item will be updated as shipped after FBA shipping 
+            completed, are you sure you want to manually ship 
+            this item in Magento?'
+            );
         }
 
         return '';
@@ -36,15 +50,18 @@ class Amazon_MCF_Block_Sales_Order_Shipment_Create_Items extends Mage_Adminhtml_
 
     /**
      * Flags a shipment item row with class indicating it is fulfilled by Amazon
+     *
      * @param $item
      *
      * @return string
      */
-    public function isFBAItem($item) {
+    public function isFBAItem($item) 
+    {
 
         if ($this->FBAEnabled()) {
 
-            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            $product = Mage::getModel('catalog/product')
+                ->load($item->getProductId());
 
 
             if ($product->getAmazonMcfEnabled()) {

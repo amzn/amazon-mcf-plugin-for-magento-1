@@ -15,12 +15,15 @@
  * permissions and limitations under the License.
  */
 
+/**
+ * Class Amazon_MCF_Model_Observer
+ */
 class Amazon_MCF_Model_Observer
 {
     /**
      * Submit fulfillment order to Amazon.
      *
-     * @param \Varien_Event_Observer $observer
+     * @param Varien_Event_Observer $observer
      */
     public function submitOrderToAmazon(Varien_Event_Observer $observer)
     {
@@ -41,14 +44,20 @@ class Amazon_MCF_Model_Observer
             return;
         }
 
-        /** @var Amazon_MCF_Model_Service_Outbound $service */
+        /**
+         * @var Amazon_MCF_Model_Service_Outbound $service
+         */
         $service = Mage::getSingleton('amazon_mcf/service_outbound');
         $response = $service->createFulfillmentOrder($order);
 
         if (!empty($response)) {
-            $order->setAmazonOrderStatus(Amazon_MCF_Helper_Data::ORDER_STATUS_RECEIVED);
+            $order->setAmazonOrderStatus(
+                Amazon_MCF_Helper_Data::ORDER_STATUS_RECEIVED
+            );
         } else {
-            $order->setAmazonOrderStatus(Amazon_MCF_Helper_Data::ORDER_STATUS_ATTEMPTED);
+            $order->setAmazonOrderStatus(
+                Amazon_MCF_Helper_Data::ORDER_STATUS_ATTEMPTED
+            );
             $order->setAmazonOrderSubmissionAttemptCount(1);
         }
     }
@@ -67,26 +76,39 @@ class Amazon_MCF_Model_Observer
             return;
         }
 
-        /** @var Amazon_MCF_Model_Service_Outbound $service */
+        /**
+         * @var Amazon_MCF_Model_Service_Outbound $service
+         */
         $service = Mage::getSingleton('amazon_mcf/service_outbound');
         $response = $service->cancelFulfillmentOrder($order);
     }
 
     /**
-     * Verify that a product configured to be fulfilled by Amazon is found in Seller Central
+     * Verify that a product configured to be fulfilled by Amazon is
+     * found in Seller Central
      *
      * @param \Varien_Event_Observer $observer
      */
-    public function verifyAmazonSku(Varien_Event_Observer $observer) {
+    public function verifyAmazonSku(Varien_Event_Observer $observer)
+    {
         $product = $observer->getProduct();
         if ($product->getAmazonMcfEnabled()) {
-            /** @var Amazon_MCF_Model_Service_Inventory $service */
+            /**
+             * @var Amazon_MCF_Model_Service_Inventory $service
+             */
             $service = Mage::getModel('amazon_mcf/service_inventory');
-            /** @var Amazon_MCF_Helper_Data $helper */
+            /**
+             *
+             *
+             * @var Amazon_MCF_Helper_Data $helper
+             */
             $helper = Mage::helper('amazon_mcf');
-            $sku = $product->getAmazonMcfSku() ? $product->getAmazonMcfSku() : $product->getSku();
+            $sku = $product->getAmazonMcfSku()
+                ? $product->getAmazonMcfSku() : $product->getSku();
 
-            $response = $service->getFulfillmentInventoryList(array('member' => array($sku)));
+            $response = $service->getFulfillmentInventoryList(
+                array('member' => array($sku))
+            );
 
             if ($response) {
                 // if there is a list of updates to provided skus, process them.
@@ -96,10 +118,16 @@ class Amazon_MCF_Model_Observer
 
                 $asin = $supplyList[0]->getASIN();
                 if (!$asin) {
-                    $helper->logInventory("Product configured to be FBA but sku ($sku) not matched in Seller Central");
-                    $message = "The SKU entered does not have an associated Seller SKU at Amazon. Please check the SKU value matches between systems: ";
+                    $helper->logInventory(
+                        "Product configured to be FBA but sku ($sku) 
+                        not matched in Seller Central"
+                    );
+                    $message = "The SKU entered does not have an associated Seller 
+                    SKU at Amazon. Please check the SKU value matches 
+                    between systems: ";
 
-                    Mage::getSingleton("adminhtml/session")->addWarning($helper->__($message) . $sku);
+                    Mage::getSingleton("adminhtml/session")
+                        ->addWarning($helper->__($message) . $sku);
                 }
             }
         }

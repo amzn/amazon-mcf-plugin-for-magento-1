@@ -15,24 +15,40 @@
  * permissions and limitations under the License.
  */
 
-class Amazon_MCF_Block_Adminhtml_System_Config_Button_Credentials extends Mage_Adminhtml_Block_System_Config_Form_Field
+/**
+ * Class Amazon_MCF_Block_Adminhtml_System_Config_Button_Credentials
+ */
+class Amazon_MCF_Block_Adminhtml_System_Config_Button_Credentials
+    extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
+    /**
+     * Constructor
+     */
     protected function _construct()
     {
         parent::_construct();
         $this->setTemplate('amazon/system/config/credentials_button.phtml');
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
         return $this->_toHtml();
     }
 
+    /**
+     * @return string
+     */
     public function getAjaxValidateUrl()
     {
         return $this->getUrl('adminhtml/mcf/validateCredentials');
     }
 
+    /**
+     * @return mixed
+     */
     public function getButtonHtml()
     {
         $html = $this->getLayout()->createBlock('adminhtml/widget_button')

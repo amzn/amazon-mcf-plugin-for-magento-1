@@ -15,7 +15,9 @@
  * permissions and limitations under the License.
  */
 
-/** @var $installer Mage_Catalog_Model_Resource_Setup */
+/**
+ * @var $installer Mage_Catalog_Model_Resource_Setup 
+ */
 $installer = $this;
 $installer->startSetup();
 

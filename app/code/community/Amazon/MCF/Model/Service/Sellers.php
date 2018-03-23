@@ -15,21 +15,43 @@
  * permissions and limitations under the License.
  */
 
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'MarketplaceWebServiceSellers' . DS . 'Client.php');
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'MarketplaceWebServiceSellers' . DS . 'Mock.php');
+require_once Mage::getBaseDir('lib') . DS . 'Amazon' . DS
+    . 'MarketplaceWebServiceSellers' . DS . 'Client.php';
+require_once Mage::getBaseDir('lib') . DS . 'Amazon' . DS
+    . 'MarketplaceWebServiceSellers' . DS . 'Mock.php';
 
+/**
+ * Class Amazon_MCF_Model_Service_Sellers
+ */
 class Amazon_MCF_Model_Service_Sellers extends Amazon_MCF_Model_Service_Abstract
 {
     const SERVICE_NAME = '/Sellers/';
     const SERVICE_CLASS = 'MarketplaceWebServiceSellers';
 
-    protected function getServiceVersion() {
+    /**
+     * @inheritdoc
+     */
+    protected function getServiceVersion()
+    {
         return MarketplaceWebServiceSellers_Client::SERVICE_VERSION;
     }
 
-    public function validateCredentials($marketplace, $sellerId, $accessKey = '******', $secretKey = '******')
-    {
-        /** @var Amazon_MCF_Helper_Data $helper */
+    /**
+     * @param string $marketplace
+     * @param string $sellerId
+     * @param string $accessKey
+     * @param string $secretKey
+     * @return null
+     */
+    public function validateCredentials(
+        $marketplace,
+        $sellerId,
+        $accessKey = '******',
+        $secretKey = '******'
+    ) {
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
 
         $endpoint = $helper->getEndpointForCountry($marketplace);
@@ -65,17 +87,27 @@ class Amazon_MCF_Model_Service_Sellers extends Amazon_MCF_Model_Service_Abstract
         );
 
         try {
-            $helper->logApi('Validating credentials with a listMarketplaceParticipations request: ' . var_export($request, true));
+            $helper->logApi(
+                'Validating credentials with a listMarketplaceParticipations 
+                request: '
+                . var_export($request, true)
+            );
             $response = $client->listMarketplaceParticipations($request);
-            $helper->logApi('listMarketplaceParticipations response: ' . $response->toXML());
+            $helper->logApi(
+                'listMarketplaceParticipations response: '
+                . $response->toXML()
+            );
         } catch (\MarketplaceWebServiceSellers_Exception $e) {
-            $response = NULL;
+            $response = null;
             $helper->logApiError('listMarketplaceParticipations', $e);
         }
 
         return $response;
     }
 
+    /**
+     * @return mixed
+     */
     public function listMarketplaceParticipations()
     {
         $helper = $this->helper;

@@ -15,42 +15,57 @@
  * permissions and limitations under the License.
  */
 
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'FBAOutboundServiceMWS' . DS . 'Client.php');
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'FBAOutboundServiceMWS' . DS . 'Mock.php');
+require_once Mage::getBaseDir('lib') . DS . 'Amazon'
+    . DS . 'FBAOutboundServiceMWS' . DS . 'Client.php';
+require_once Mage::getBaseDir('lib') . DS . 'Amazon'
+    . DS . 'FBAOutboundServiceMWS' . DS . 'Mock.php';
 
-class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstract {
+/**
+ * Class Amazon_MCF_Model_Service_Outbound
+ */
+class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstract
+{
 
     const SERVICE_NAME = '/FulfillmentOutboundShipment/';
     const SERVICE_CLASS = 'FBAOutboundServiceMWS';
 
-    protected function getServiceVersion() {
+    /**
+     * @inheritdoc
+     */
+    protected function getServiceVersion()
+    {
         return FBAOutboundServiceMWS_Client::SERVICE_VERSION;
     }
 
     /**
-     * @param \Mage_Customer_Model_Address_Abstract $address
-     * @param \Mage_Sales_Model_Resource_Quote_Item_Collection|\FBAOutboundServiceMWS_Model_GetFulfillmentPreviewItemList $items
-     *
-     * @return \FBAOutboundServiceMWS_Model_GetFulfillmentPreviewResponse
+     * @param Mage_Customer_Model_Address_Abstract $address
+     * @param $items
+     * @return FBAOutboundServiceMWS_Model_GetFulfillmentPreviewResponse|null
      */
-    public function getFulfillmentPreview(Mage_Customer_Model_Address_Abstract $address, $items)
-    {
-        /** @var Amazon_MCF_Helper_Data $helper */
+    public function getFulfillmentPreview(
+        Mage_Customer_Model_Address_Abstract $address,
+        $items
+    ) {
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
         $client = $this->getClient();
 
         $conversionHelper = Mage::helper('amazon_mcf/conversion');
         $address = $conversionHelper->getAmazonAddressArray($address);
 
-        $quoteDetails =
-            array(
-                'Address' => $address,
-                'Items' => $items,
-            );
+        $quoteDetails
+            = array(
+            'Address' => $address,
+            'Items' => $items,
+        );
 
-        // If Amazon carrier is not enabled, will be shipped standard so only get that preview
+        // If Amazon carrier is not enabled, will be shipped standard so only
+        // get that preview
         if (!$helper->getCarrierEnabled()) {
-            $quoteDetails['ShippingSpeedCategories'] = array('member' => array('Standard'));
+            $quoteDetails['ShippingSpeedCategories']
+                = array('member' => array('Standard'));
         }
 
         $request = $this->getRequest(
@@ -58,26 +73,40 @@ class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstrac
         );
 
         try {
-            $helper->logApi('getFulfillmentPreview request: ' . var_export($request, true));
+            $helper->logApi(
+                'getFulfillmentPreview request: '
+                . var_export($request, true)
+            );
             $response = $client->getFulfillmentPreview($request);
-            $helper->logApi('getFulfillmentPreview response: ' . $response->toXML());
+            $helper->logApi(
+                'getFulfillmentPreview response: '
+                . $response->toXML()
+            );
         } catch (\FBAOutboundServiceMWS_Exception $e) {
-            $response = NULL;
+            $response = null;
             $helper->logApiError('getFulfillmentPreview', $e);
         }
 
         return $response;
     }
 
+    /**
+     * @param Mage_Sales_Model_Order $order
+     * @return FBAOutboundServiceMWS_Model_CreateFulfillmentOrderResponse|null
+     */
     public function createFulfillmentOrder(Mage_Sales_Model_Order $order)
     {
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
         $client = $this->getClient();
 
         $conversionHelper = Mage::helper('amazon_mcf/conversion');
 
-        $address = $conversionHelper->getAmazonAddressArray($order->getShippingAddress());
+        $address = $conversionHelper->getAmazonAddressArray(
+            $order->getShippingAddress()
+        );
         $items = $conversionHelper->getAmazonItemsArray($order->getAllItems());
         $timestamp = $conversionHelper->getIso8601Timestamp($order->getCreatedAt());
         $shipping = $conversionHelper->getShippingSpeed($order->getShippingMethod());
@@ -100,19 +129,32 @@ class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstrac
         );
 
         try {
-            $helper->logApi('createFulfillmentOrder request: ' . var_export($request, true));
+            $helper->logApi(
+                'createFulfillmentOrder request: '
+                . var_export($request, true)
+            );
             $response = $client->createFulfillmentOrder($request);
-            $helper->logApi('createFulfillmentOrder response: ' . $response->toXML());
+            $helper->logApi(
+                'createFulfillmentOrder response: ' . $response->toXML()
+            );
         } catch (\FBAOutboundServiceMWS_Exception $e) {
-            $response = NULL;
+            $response = null;
             $helper->logApiError('createFulfillmentOrder', $e);
         }
         return $response;
     }
 
+    /**
+     * @param Mage_Sales_Model_Order $order
+     * @return FBAOutboundServiceMWS_Model_CancelFulfillmentOrderResponse|null
+     */
     public function cancelFulfillmentOrder(Mage_Sales_Model_Order $order)
     {
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         *
+         *
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
         $client = $this->getClient();
 
@@ -125,19 +167,30 @@ class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstrac
 
 
         try {
-            $helper->logApi('cancelFulfillmentOrder request: ' . var_export($request, true));
+            $helper->logApi(
+                'cancelFulfillmentOrder request: '
+                . var_export($request, true)
+            );
             $response = $client->cancelFulfillmentOrder($request);
-            $helper->logApi('cancelFulfillmentOrder response: ' . $response->toXML());
+            $helper->logApi(
+                'cancelFulfillmentOrder response: ' . $response->toXML()
+            );
         } catch (\FBAOutboundServiceMWS_Exception $e) {
-            $response = NULL;
+            $response = null;
             $helper->logApiError('cancelFulfillmentOrder', $e);
         }
         return $response;
     }
 
+    /**
+     * @param $order
+     * @return FBAOutboundServiceMWS_Model_GetFulfillmentOrderResponse|null
+     */
     public function getFulfillmentOrder($order)
     {
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
         $client = $this->getClient();
 
@@ -149,20 +202,33 @@ class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstrac
         );
 
         try {
-            $helper->logApi('getFulfillmentOrder request: ' . var_export($request, true));
+            $helper->logApi(
+                'getFulfillmentOrder request: '
+                . var_export($request, true)
+            );
             $response = $client->getFulfillmentOrder($request);
-            $helper->logApi('getFulfillmentOrder response: ' . $response->toXML());
+            $helper->logApi(
+                'getFulfillmentOrder response: ' . $response->toXML()
+            );
         } catch (\FBAOutboundServiceMWS_Exception $e) {
-            $response = NULL;
+            $response = null;
             $helper->logApiError('getFulfillmentOrder', $e);
         }
 
         return $response;
     }
 
+    /**
+     * @param string $productId
+     * @param string $zip
+     * @param int    $qty
+     * @return bool|FBAOutboundServiceMWS_Model_GetFulfillmentPreviewResponse|null
+     */
     public function getDeliveryEstimate($productId, $zip, $qty = 1)
     {
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
         $client = $this->getClient();
         $conversionHelper = Mage::helper('amazon_mcf/conversion');
@@ -172,7 +238,7 @@ class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstrac
             return false;
         }
 
-        $address = array (
+        $address = array(
             'Name' => 'Delivery Preview',
             'Line1' => '1 Main St',
             'Line2' => '',
@@ -188,15 +254,17 @@ class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstrac
         $items = array();
         $items[] = $conversionHelper->getAmazonItem($product, $qty);
 
-        $quoteDetails =
-            array(
-                'Address' => $address,
-                'Items' => array('member' => $items),
-            );
+        $quoteDetails
+            = array(
+            'Address' => $address,
+            'Items' => array('member' => $items),
+        );
 
-        // If Amazon carrier is not enabled, will be shipped standard so only get that preview
+        // If Amazon carrier is not enabled, will be shipped standard
+        // so only get that preview
         if (!$helper->getCarrierEnabled()) {
-            $quoteDetails['ShippingSpeedCategories'] = array('member' => array('Standard'));
+            $quoteDetails['ShippingSpeedCategories']
+                = array('member' => array('Standard'));
         }
 
         $request = $this->getRequest(
@@ -204,12 +272,20 @@ class Amazon_MCF_Model_Service_Outbound extends Amazon_MCF_Model_Service_Abstrac
         );
 
         try {
-            $helper->logApi('getFulfillmentPreview request for delivery estimate: ' . var_export($request, true));
+            $helper->logApi(
+                'getFulfillmentPreview request for delivery estimate: '
+                . var_export($request, true)
+            );
             $response = $client->getFulfillmentPreview($request);
-            $helper->logApi('getFulfillmentPreview response for delivery estimate: ' . $response->toXML());
+            $helper->logApi(
+                'getFulfillmentPreview response for delivery estimate: '
+                . $response->toXML()
+            );
         } catch (\FBAOutboundServiceMWS_Exception $e) {
-            $response = NULL;
-            $helper->logApiError('getFulfillmentPreview for delivery estimate', $e);
+            $response = null;
+            $helper->logApiError(
+                'getFulfillmentPreview for delivery estimate', $e
+            );
         }
 
         return $response;

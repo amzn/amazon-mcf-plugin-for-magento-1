@@ -15,8 +15,16 @@
  * permissions and limitations under the License.
  */
 
+/**
+ * Class Amazon_MCF_Model_System_Config_Source_Dropdown_Marketplaces
+ */
 class Amazon_MCF_Model_System_Config_Source_Dropdown_Marketplaces
 {
+    /**
+     * Returns an array of country options to use as Marketplace endpoints
+     *
+     * @return array
+     */
     public function toOptionArray()
     {
         return array(

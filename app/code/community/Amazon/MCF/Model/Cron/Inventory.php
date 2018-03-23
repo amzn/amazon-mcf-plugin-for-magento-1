@@ -15,24 +15,38 @@
  * permissions and limitations under the License.
  */
 
-class Amazon_MCF_Model_Cron_Inventory {
+/**
+ * Class Amazon_MCF_Model_Cron_Inventory
+ */
+class Amazon_MCF_Model_Cron_Inventory
+{
 
-    public function inventoryUpdate() {
+    /**
+     * Updates inventory during cron - products must be marked for Amazon updates.
+     */
+    public function inventoryUpdate()
+    {
 
-        /** @var Amazon_MCF_Model_Service_Inventory $service */
+        /**
+         * @var Amazon_MCF_Model_Service_Inventory $service
+         */
         $service = Mage::getModel('amazon_mcf/service_inventory');
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = Mage::helper('amazon_mcf');
 
         // check if next token exists before proceeding with regular call.
         $token = $helper->getInventoryNextToken();
         if (!empty($token)) {
             $response = $service->getListInventorySupplyByNextToken($token);
-        }
-        else {
+        } else {
             // used -1 day since inventory changes are from given time to present,
             // current time would not return data.
-            $startTime = gmdate(Amazon_MCF_Helper_Conversion::ISO8601_FORMAT, strtotime('-1 day'));
+            $startTime = gmdate(
+                Amazon_MCF_Helper_Conversion::ISO8601_FORMAT,
+                strtotime('-1 day')
+            );
             $response = $service->getFulfillmentInventoryList(array(), $startTime);
         }
 
@@ -49,14 +63,12 @@ class Amazon_MCF_Model_Cron_Inventory {
 
             if ($nextToken) {
                 $helper->setInventoryNextToken($nextToken);
-            }
-            else {
+            } else {
                 $helper->setInventoryNextToken(false);
             }
-        }
-        else {
-            // If no response, make sure next token is set to empty string for future calls.
-            // It's possible call was made with invalid token
+        } else {
+            // If no response, make sure next token is set to empty string for
+            // future calls.  It's possible call was made with invalid token
             $helper->setInventoryNextToken('');
         }
     }
@@ -67,7 +79,8 @@ class Amazon_MCF_Model_Cron_Inventory {
      *
      * see crontab.xml for setup details
      */
-    public function cronFullInventoryStatus() {
+    public function cronFullInventoryStatus()
+    {
         $helper = Mage::helper('amazon_mcf');
 
         $status = $helper->getInventoryProcessRunning();
@@ -84,10 +97,12 @@ class Amazon_MCF_Model_Cron_Inventory {
 
             $products = $this->getAmazonFulfilledSkus($page, $rowCount);
 
-            // if there are Amazon MCF enabled products, prepare to update inventory and use alt sku for query if it exists.
+            // if there are Amazon MCF enabled products, prepare to update
+            // inventory and use alt sku for query if it exists.
             if ($products->count() > 0) {
                 if ($products->getLastPageNumber() == $page) {
-                    // This is the last batch of products, turn processing off and reset page
+                    // This is the last batch of products, turn processing
+                    // off and reset page
                     $helper->setInventoryProcessPage(1);
                     $helper->setInventoryProcessRunning(false);
                 } else {
@@ -96,12 +111,19 @@ class Amazon_MCF_Model_Cron_Inventory {
 
                 $skus = array();
                 foreach ($products as $product) {
-                    $skus[] = $product->getAmazonMcfSku() ? $product->getAmazonMcfSku() : $product->getSku();
+                    $skus[] = $product->getAmazonMcfSku()
+                        ? $product->getAmazonMcfSku() : $product->getSku();
                 }
 
-                /** @var Amazon_MCF_Model_Service_Inventory $service */
+                /**
+                 *
+                 *
+                 * @var Amazon_MCF_Model_Service_Inventory $service
+                 */
                 $service = Mage::getModel('amazon_mcf/service_inventory');
-                $response = $service->getFulfillmentInventoryList(array('member' => $skus));
+                $response = $service->getFulfillmentInventoryList(
+                    array('member' => $skus)
+                );
 
                 if ($response) {
                     // if there is a list of updates to provided skus, process them.
@@ -112,8 +134,7 @@ class Amazon_MCF_Model_Cron_Inventory {
                         $this->processSupplyListData($supplyList, $products);
                     }
                 }
-            }
-            else {
+            } else {
                 // turn off process and reset start row
                 $helper->setInventoryProcessRunning(false);
                 $helper->setInventoryProcessRow(0);
@@ -128,7 +149,8 @@ class Amazon_MCF_Model_Cron_Inventory {
      * @param $supplyList
      * @param $products
      */
-    protected function processSupplyListData($supplyList, $products) {
+    protected function processSupplyListData($supplyList, $products)
+    {
         $skuQuantities = array();
         $missingSkus = array();
 
@@ -136,7 +158,8 @@ class Amazon_MCF_Model_Cron_Inventory {
             $sku = $item->getSellerSKU();
             $asin = $item->getASIN();
             $earliestAvailability = $item->getEarliestAvailability();
-            $availability = empty($earliestAvailability) ? '' : $earliestAvailability->getTimepointType();
+            $availability = empty($earliestAvailability)
+                ? '' : $earliestAvailability->getTimepointType();
             $inStock = $item->getInStockSupplyQuantity();
 
             // check the sku was matched in Amazon
@@ -146,14 +169,21 @@ class Amazon_MCF_Model_Cron_Inventory {
         }
 
 
-        // now compare Amazon MCF inventory data with original list of Magento inventory data and update stock if needed
+        // now compare Amazon MCF inventory data with original list of Magento
+        // inventory data and update stock if needed
         foreach ($products as $product) {
-            $sku = $product->getAmazonMcfSku() ? $product->getAmazonMcfSku() : $product->getSku();
+            $sku = $product->getAmazonMcfSku()
+                ? $product->getAmazonMcfSku() : $product->getSku();
 
             if (isset($skuQuantities[$sku])) {
                 $stockItem = $product->getStockItem();
                 if (empty($stockItem)) {
-                    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
+                    $stockItem = Mage::getModel(
+                        'cataloginventory/stock_item'
+                    )
+                        ->loadByProduct(
+                            $product->getId()
+                        );
                 }
                 if ($stockItem->getManageStock()) {
                     $stockItem->setQty($skuQuantities[$sku]);
@@ -162,37 +192,50 @@ class Amazon_MCF_Model_Cron_Inventory {
                 }
             } else {
                 if ($sku != $product->getSku()) {
-                    $sku = $product->getSku() . " ($sku)"; // include both Magento and Amazon skus in message if different
+                    // include both Magento and Amazon skus in message if different
+                    $sku = $product->getSku() . " ($sku)";
                 }
                 $missingSkus[] = $sku;
             }
         }
 
         if (!empty($missingSkus)) {
-            $message = "Some skus were not found in Amazon Seller Central: " . join(', ', $missingSkus);
-            /** @var Mage_AdminNotification_Model_Inbox $inbox */
+            $message = "Some skus were not found in Amazon Seller Central: "
+                . join(', ', $missingSkus);
+            /**
+             *
+             *
+             * @var Mage_AdminNotification_Model_Inbox $inbox
+             */
             $inbox = Mage::getModel('adminnotification/inbox');
-            $inbox->add(Mage_AdminNotification_Model_Inbox::SEVERITY_MINOR, 'Amazon SKU Mismatch for ' . sizeof($message) . ' product(s)', $message);
+            $inbox->add(
+                Mage_AdminNotification_Model_Inbox::SEVERITY_MINOR,
+                'Amazon SKU Mismatch for '
+                . sizeof($message) . ' product(s)', $message
+            );
         }
     }
 
     /**
-     * Gets a product collection of all Amazon Fulfillment enabled sku data related to
-     * product entity id
+     * Gets a product collection of all Amazon Fulfillment enabled sku data related
+     * to product entity id
      *
+     * @param  $page
+     * @param  $rowCount
      * @return \Mage_Catalog_Model_Resource_Product_Collection
      */
-    protected function getAmazonFulfilledSkus($page, $rowCount) {
+    protected function getAmazonFulfilledSkus($page, $rowCount)
+    {
         $products = Mage::getResourceModel('catalog/product_collection')
             ->addAttributeToSelect('sku')
             ->addAttributeToSelect('amazon_mcf_sku')
             ->addAttributeToFilter('amazon_mcf_enabled', '1')
             ->setPageSize($rowCount)
             ->setCurPage($page)
-            ->setOrder('entity_id', 'asc')
-        ;
+            ->setOrder('entity_id', 'asc');
 
-        Mage::getSingleton('cataloginventory/stock')->addItemsToProducts($products);
+        Mage::getSingleton('cataloginventory/stock')
+            ->addItemsToProducts($products);
 
         return $products;
     }
@@ -203,7 +246,8 @@ class Amazon_MCF_Model_Cron_Inventory {
      *
      * @param $supplyList
      */
-    protected function updateInventoryProcessStatus($supplyList) {
+    protected function updateInventoryProcessStatus($supplyList)
+    {
         $skuQuantities = $this->getMatchedSkus($supplyList);
 
         if ($skuQuantities) {
@@ -211,7 +255,9 @@ class Amazon_MCF_Model_Cron_Inventory {
 
             if ($matches) {
                 foreach ($matches as $productId => $stockValue) {
-                    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($productId);
+                    $stockItem = Mage::getModel(
+                        'cataloginventory/stock_item'
+                    )->loadByProduct($productId);
                     if ($stockItem->getManageStock()) {
                         $stockItem->setQty($stockValue['qty']);
                         $stockItem->setIsInStock((int)($stockValue['qty'] > 0));
@@ -225,13 +271,15 @@ class Amazon_MCF_Model_Cron_Inventory {
     }
 
     /**
-     * Finds matches with SKUs returned from Amazon MCF API with products in Magento system
+     * Finds matches with SKUs returned from Amazon MCF API with products in
+     * Magento system
      *
      * @param $skuQuantities
      *
      * @return array
      */
-    protected function getMagentoInventoryData($skuQuantities) {
+    protected function getMagentoInventoryData($skuQuantities)
+    {
         $matches = array();
 
         $skus = array();
@@ -241,18 +289,23 @@ class Amazon_MCF_Model_Cron_Inventory {
         }
 
         if ($skus) {
-            $skuFilter = array('attribute' =>'sku', 'in' => $skus);
-            $overriddenSkuFilter = array('attribute' =>'amazon_mcf_sku', 'in' => $skus);
+            $skuFilter = array('attribute' => 'sku', 'in' => $skus);
+            $overriddenSkuFilter = array(
+                'attribute' => 'amazon_mcf_sku',
+                'in' => $skus
+            );
+            // match sku OR amazon_mcf_sku
             $products = Mage::getResourceModel('catalog/product_collection')
                 ->addAttributeToSelect('amazon_mcf_sku')
                 ->addAttributeToFilter('amazon_mcf_enabled', '1')
-                ->addAttributeToFilter(array($skuFilter, $overriddenSkuFilter)) // match sku OR amazon_mcf_sku
-            ;
+                ->addAttributeToFilter(array($skuFilter, $overriddenSkuFilter));
 
-            Mage::getSingleton('cataloginventory/stock')->addItemsToProducts($products);
+            Mage::getSingleton('cataloginventory/stock')
+                ->addItemsToProducts($products);
 
             foreach ($products as $product) {
-                $sku = $product->getAmazonMcfSku() ? $product->getAmazonMcfSku() : $product->getSku();
+                $sku = $product->getAmazonMcfSku()
+                    ? $product->getAmazonMcfSku() : $product->getSku();
                 $matches[$product->getId()] = array(
                     'sku' => $sku,
                     'qty' => isset($skuQuantities[$sku]) ? $skuQuantities[$sku] : 0,
@@ -270,7 +323,8 @@ class Amazon_MCF_Model_Cron_Inventory {
      *
      * @return array
      */
-    protected function getMatchedSkus($supplyList) {
+    protected function getMatchedSkus($supplyList)
+    {
         $skuQuantities = array();
 
         foreach ($supplyList as $item) {
@@ -291,7 +345,8 @@ class Amazon_MCF_Model_Cron_Inventory {
      *
      * @param $skuData
      */
-    private function _createInventoryNotifications($skuData) {
+    private function _createInventoryNotifications($skuData)
+    {
         $skus = array();
 
         foreach ($skuData as $entity_id => $productData) {
@@ -299,23 +354,31 @@ class Amazon_MCF_Model_Cron_Inventory {
             if (!$productData['hasData']) {
                 if (isset($productData['alt_sku'])) {
                     $skus[] = $productData['alt_sku'];
-                }
-                else {
+                } else {
                     $skus[] = $productData['sku'];
                 }
             }
         }
 
         if ($skus) {
-            $message = 'The following SKUs have no associated Amazon Fulfillment data or no available inventory: ' . implode(', ', $skus) . '. The stock quantities for these SKUs has been set to 0. If this is incorrect, please disable Amazon Fulfillment for these products or ensure Amazon Merchant SKU is correct.';
+            $message = 'The following SKUs have no associated Amazon Fulfillment 
+            data or no available inventory: ' . implode(', ', $skus)
+                . '. The stock quantities for these SKUs has been set to 0. If 
+                this is incorrect, please disable Amazon Fulfillment for these 
+                products or ensure Amazon Merchant SKU is correct.';
             Mage::helper('amazon_mcf')->logInventory($message);
         }
     }
 
     /**
-     * Creates appropriate notification explaining that Amazon returned values for SKUs/Products that do not exist in Magento
+     * Creates appropriate notification explaining that Amazon returned values
+     * for SKUs/Products that do not exist in Magento
+     *
+     * @param $skuQuantities
+     * @param $matches
      */
-    private function _createMissingInventoryNotifications($skuQuantities, $matches) {
+    private function _createMissingInventoryNotifications($skuQuantities, $matches)
+    {
 
         $updated = array();
         $skus = array();
@@ -331,7 +394,10 @@ class Amazon_MCF_Model_Cron_Inventory {
         }
 
         if ($skus) {
-           $message = 'The following SKUs have no associated Magento Product: ' . implode(', ', $skus) . '. Please create these products and assign the Amazon Sku to the Merchant Sku field and enable the product for Amazon Fulfillment.';
+            $message = 'The following SKUs have no associated Magento Product: '
+                . implode(', ', $skus) . '. Please create these products and 
+                assign the Amazon Sku to the Merchant Sku field and enable the 
+                product for Amazon Fulfillment.';
             Mage::helper('amazon_mcf')->logInventory($message);
         }
     }

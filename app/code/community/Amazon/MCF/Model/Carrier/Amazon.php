@@ -15,25 +15,24 @@
  * permissions and limitations under the License.
  */
 
+/**
+ * Class Amazon_MCF_Model_Carrier_Amazon
+ */
 class Amazon_MCF_Model_Carrier_Amazon
     extends Mage_Shipping_Model_Carrier_Abstract
     implements Mage_Shipping_Model_Carrier_Interface
 {
-
-
     protected $_code = 'amazon_mcf_carrier';
     protected $_isFixed = false;
     protected $_methodTitles = array(
-        'standard'  => 'Standard',
+        'standard' => 'Standard',
         'expedited' => 'Expedited',
-        'priority'  => 'Priority',
+        'priority' => 'Priority',
     );
 
     /**
-     * Enter description here...
-     *
-     * @param Mage_Shipping_Model_Rate_Request $data
-     * @return Mage_Shipping_Model_Rate_Result
+     * @param Mage_Shipping_Model_Rate_Request $request
+     * @return bool|false|Mage_Core_Model_Abstract|Mage_Shipping_Model_Rate_Result|null
      */
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
@@ -46,16 +45,22 @@ class Amazon_MCF_Model_Carrier_Amazon
 
         $rates = $this->getShippingRates($request);
 
-        foreach ($rates as $method => $details)
-        {
-            /** @var Mage_Shipping_Model_Rate_Result_Method $rate */
+        foreach ($rates as $method => $details) {
+            /**
+             * @var Mage_Shipping_Model_Rate_Result_Method $rate
+             */
             $rate = Mage::getModel('shipping/rate_result_method');
             $rate->setCarrier($this->_code);
             $rate->setCarrierTitle($this->getConfigData('title'));
             $rate->setMethod(strtolower($method));
             $methodTitle = $method;
-            if ($helper->getDisplayEstimatedArrival() && array_key_exists('earliest', $details) && array_key_exists('latest', $details)) {
-                $methodTitle = $method . ' (Delivery ' . date('n/j', $details['earliest']) . ' - ' . date('n/j', $details['latest']) . ')';
+            if ($helper->getDisplayEstimatedArrival()
+                && array_key_exists('earliest', $details)
+                && array_key_exists('latest', $details)
+            ) {
+                $methodTitle = $method . ' (Delivery '
+                    . date('n/j', $details['earliest']) . ' - '
+                    . date('n/j', $details['latest']) . ')';
             }
             $rate->setMethodTitle($methodTitle);
             $rate->setPrice($details['fee']);
@@ -66,12 +71,15 @@ class Amazon_MCF_Model_Carrier_Amazon
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function getAllowedMethods()
     {
         return array(
-            'standard'  => 'Standard',
+            'standard' => 'Standard',
             'expedited' => 'Expedited',
-            'priority'  => 'Priority',
+            'priority' => 'Priority',
         );
     }
 
@@ -83,12 +91,17 @@ class Amazon_MCF_Model_Carrier_Amazon
      *
      * @return Varien_Object
      */
-    protected function _doShipmentRequest(Varien_Object $request) {
+    protected function _doShipmentRequest(Varien_Object $request)
+    {
         $result = new Varien_Object();
 
         return $result;
     }
 
+    /**
+     * @param Mage_Shipping_Model_Rate_Request $request
+     * @return array
+     */
     protected function getShippingRates(Mage_Shipping_Model_Rate_Request $request)
     {
         $helper = Mage::helper('amazon_mcf');
@@ -100,7 +113,9 @@ class Amazon_MCF_Model_Carrier_Amazon
             return $rates;
         }
 
-        /** @var Amazon_MCF_Model_Service_Outbound $service */
+        /**
+         * @var Amazon_MCF_Model_Service_Outbound $service
+         */
         $service = Mage::getSingleton('amazon_mcf/service_outbound');
         $address = $this->getAddressFromShippingRateRequest($request);
 
@@ -109,41 +124,66 @@ class Amazon_MCF_Model_Carrier_Amazon
             $rates = $this->getRatesFromFulfillmentPreview($fulfillmentPreview);
         }
 
-        // either not configured or wasn't able to pull Amazon rates, use fallback amounts
+        // either not configured or wasn't able to pull Amazon rates,
+        // use fallback amounts
         if (empty($rates)) {
-            $rates = array('Standard' => array('fee' => $helper->getDefaultStandardShippingCost($request->getStoreId())));
+            $rates = array(
+                'Standard' => array(
+                    'fee' => $helper->getDefaultStandardShippingCost(
+                        $request->getStoreId()
+                    )
+                )
+            );
         } elseif (!$helper->getUseAmazonShippingFees($request->getStoreId())) {
             $defaultRates = array(
-                'Standard' => array('fee' => $helper->getDefaultStandardShippingCost($request->getStoreId())),
-                'Expedited' => array('fee' => $helper->getDefaultExpeditedShippingCost($request->getStoreId())),
-                'Priority' => array('fee' => $helper->getDefaultPriorityShippingCost($request->getStoreId()))
+                'Standard' => array(
+                    'fee' => $helper->getDefaultStandardShippingCost(
+                        $request->getStoreId()
+                    )
+                ),
+                'Expedited' => array(
+                    'fee' => $helper->getDefaultExpeditedShippingCost(
+                        $request->getStoreId()
+                    )
+                ),
+                'Priority' => array(
+                    'fee' => $helper->getDefaultPriorityShippingCost(
+                        $request->getStoreId()
+                    )
+                )
             );
 
             // Only update rates that are returned for the destination
-            foreach($rates as $speed => $rate) {
+            foreach ($rates as $speed => $rate) {
                 $rates[$speed]['fee'] = $defaultRates[$speed]['fee'];
             }
         }
 
-        // check for non-FBA items in cart and prevent Amazon rates from being offered.
-        $isFBA = FALSE;
-        $nonFBA = FALSE;
+        // check for non-FBA items in cart and prevent Amazon rates
+        // from being offered.
+        $isFBA = false;
+        $nonFBA = false;
 
         $items = $request->getAllItems();
         if ($items) {
             foreach ($items as $item) {
 
                 if ($item->getProduct()->getAmazonMcfEnabled()) {
-                    $isFBA = TRUE;
-                }
-                else {
-                    $nonFBA = TRUE;
+                    $isFBA = true;
+                } else {
+                    $nonFBA = true;
                 }
             }
 
 
             if (!$rates && $isFBA && !$nonFBA) {
-                $rates = array('Standard' => array('price' => $helper->getDefaultStandardShippingCost($request->getStoreId())));
+                $rates = array(
+                    'Standard' => array(
+                        'price' => $helper->getDefaultStandardShippingCost(
+                            $request->getStoreId()
+                        )
+                    )
+                );
             }
 
             // if any non-fba items are in cart, offer no rates
@@ -155,9 +195,16 @@ class Amazon_MCF_Model_Carrier_Amazon
         return $rates;
     }
 
-    protected function getAddressFromShippingRateRequest(Mage_Shipping_Model_Rate_Request $request)
-    {
-        /** @var Mage_Sales_Model_Quote_Address $address */
+    /**
+     * @param Mage_Shipping_Model_Rate_Request $request
+     * @return Mage_Sales_Model_Quote_Address
+     */
+    protected function getAddressFromShippingRateRequest(
+        Mage_Shipping_Model_Rate_Request $request
+    ) {
+        /**
+         * @var Mage_Sales_Model_Quote_Address $address
+         */
         $address = Mage::getModel('sales/quote_address');
         $street = $request->getDestStreet();
         if (empty($street)) {
@@ -172,8 +219,7 @@ class Amazon_MCF_Model_Carrier_Amazon
             ->setRegionId($request->getDestRegionId())
             ->setCountryId($request->getDestCountryId())
             ->setPostcode($request->getDestPostcode())
-            ->setTelephone('123456790')
-        ;
+            ->setTelephone('123456790');
 
         return $address;
     }
@@ -183,8 +229,9 @@ class Amazon_MCF_Model_Carrier_Amazon
      *
      * @return \FBAOutboundServiceMWS_Model_GetFulfillmentPreviewItemList
      */
-    protected function getItemsFromShippingRateRequest(Mage_Shipping_Model_Rate_Request $request)
-    {
+    protected function getItemsFromShippingRateRequest(
+        Mage_Shipping_Model_Rate_Request $request
+    ) {
         $items = $request->getAllItems();
         $conversionHelper = Mage::helper('amazon_mcf/conversion');
 
@@ -192,21 +239,35 @@ class Amazon_MCF_Model_Carrier_Amazon
 
     }
 
+    /**
+     * @param $fulfillmentPreview
+     * @return array
+     */
     public function getRatesFromFulfillmentPreview($fulfillmentPreview)
     {
-        $previews = $fulfillmentPreview->getGetFulfillmentPreviewResult()->getFulfillmentPreviews()->getmember();
+        $previews = $fulfillmentPreview->getGetFulfillmentPreviewResult()
+            ->getFulfillmentPreviews()->getmember();
         $rates = array();
 
-        /** @var FBAOutboundServiceMWS_Model_FulfillmentPreview $preview */
-        foreach ($previews as $preview)
-        {
+        /**
+         * @var FBAOutboundServiceMWS_Model_FulfillmentPreview $preview
+         */
+        foreach ($previews as $preview) {
             if ($preview->getIsFulfillable() != 'false') {
                 $title = $preview->getShippingSpeedCategory();
-                $earliestDelivery = $preview->getFulfillmentPreviewShipments()->getMember()[0]->getEarliestArrivalDate();
-                $latestDelivery = $preview->getFulfillmentPreviewShipments()->getMember()[0]->getLatestArrivalDate();
-                $shippingFee = $this->calculateShippingFee($preview->getEstimatedFees());
+                $earliestDelivery = $preview->getFulfillmentPreviewShipments()
+                    ->getMember()[0]->getEarliestArrivalDate();
+                $latestDelivery = $preview->getFulfillmentPreviewShipments()
+                    ->getMember()[0]->getLatestArrivalDate();
+                $shippingFee = $this->calculateShippingFee(
+                    $preview->getEstimatedFees()
+                );
 
-                $rates[$title] = array('fee' => $shippingFee, 'earliest' => strtotime($earliestDelivery), 'latest' => strtotime($latestDelivery));
+                $rates[$title] = array(
+                    'fee' => $shippingFee,
+                    'earliest' => strtotime($earliestDelivery),
+                    'latest' => strtotime($latestDelivery)
+                );
             }
         }
 

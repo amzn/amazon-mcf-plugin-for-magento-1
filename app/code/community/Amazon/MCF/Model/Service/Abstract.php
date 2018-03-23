@@ -15,6 +15,9 @@
  * permissions and limitations under the License.
  */
 
+/**
+ * Class Amazon_MCF_Model_Service_Abstract
+ */
 class Amazon_MCF_Model_Service_Abstract
 {
     protected $helper = null;
@@ -25,10 +28,15 @@ class Amazon_MCF_Model_Service_Abstract
     // Each implementing class should override this with correct service class name
     const SERVICE_CLASS = null;
 
+    /**
+     * Amazon_MCF_Model_Service_Abstract constructor.
+     */
     public function __construct()
     {
-        /** @var Amazon_MCF_Helper_Data helper */
-        $this->helper= Mage::helper('amazon_mcf');
+        /**
+         * @var Amazon_MCF_Helper_Data helper
+         */
+        $this->helper = Mage::helper('amazon_mcf');
     }
 
     /**
@@ -41,6 +49,13 @@ class Amazon_MCF_Model_Service_Abstract
         return '2017-01-01';
     }
 
+    /**
+     * Returns service endpoint URL
+     *
+     * @param  null $store
+     * @param  null $endpoint
+     * @return string
+     */
     protected function getServiceUrl($store = null, $endpoint = null)
     {
         if (empty($endpoint)) {
@@ -50,17 +65,28 @@ class Amazon_MCF_Model_Service_Abstract
         return $endpoint . $this::SERVICE_NAME . $this->getServiceVersion();
     }
 
+    /**
+     * Returns mock or production client class
+     *
+     * @return string
+     */
     protected function getServiceClass()
     {
-        return $this::SERVICE_CLASS . ($this->helper->isDebug() ? '_Mock' : '_Client');
+        return $this::SERVICE_CLASS . (
+            $this->helper->isDebug() ? '_Mock' : '_Client'
+            );
     }
 
     /**
+     * Returns instance of MWS outbound service client
+     *
      * @return FBAOutboundServiceMWS_Client
      */
     protected function getClient()
     {
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
 
         $config = array(
@@ -81,6 +107,10 @@ class Amazon_MCF_Model_Service_Abstract
     }
 
     /**
+     * Creates base request array and adds specific call parameters
+     *
+     * @param  array $params
+     * @param  null  $store
      * @return array
      */
     protected function getRequest($params = array(), $store = null)

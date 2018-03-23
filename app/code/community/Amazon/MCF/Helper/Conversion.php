@@ -15,19 +15,31 @@
  * permissions and limitations under the License.
  */
 
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'FBAOutboundServiceMWS' . DS . 'Model' . DS . 'Address.php');
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'FBAOutboundServiceMWS' . DS . 'Model' . DS . 'GetFulfillmentPreviewItem.php');
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'FBAOutboundServiceMWS' . DS . 'Model' . DS . 'GetFulfillmentPreviewItemList.php');
+require_once Mage::getBaseDir('lib') . DS . 'Amazon' . DS
+    . 'FBAOutboundServiceMWS' . DS . 'Model' . DS . 'Address.php';
+require_once Mage::getBaseDir('lib') . DS . 'Amazon' . DS
+    . 'FBAOutboundServiceMWS' . DS . 'Model' . DS . 'GetFulfillmentPreviewItem.php';
+require_once Mage::getBaseDir('lib') . DS . 'Amazon' . DS
+    . 'FBAOutboundServiceMWS' . DS . 'Model'
+    . DS . 'GetFulfillmentPreviewItemList.php';
 
-class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
-
+/**
+ * Class Amazon_MCF_Helper_Conversion
+ */
+class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract
+{
+    
     const ISO8601_FORMAT = 'Y-m-d\TH:i:s.Z\Z';
+
     protected $carriers = array(
-        'USPS' => array('carrier_code' => 'usps', 'title' => 'United States Postal Service'),
-        'UPS'  => array('carrier_code' => 'ups', 'title' => 'United Parcel Service'),
+        'USPS' => array(
+            'carrier_code' => 'usps',
+            'title' => 'United States Postal Service'
+        ),
+        'UPS' => array('carrier_code' => 'ups', 'title' => 'United Parcel Service'),
         'UPSM' => array('carrier_code' => 'ups', 'title' => 'United Parcel Service'),
-        'DHL' => ['carrier_code' => 'dhl', 'title' => 'DHL'],
-        'FEDEX' => ['carrier_code' => 'fedex', 'title' => 'Federal Express'],
+        'DHL' => array('carrier_code' => 'dhl', 'title' => 'DHL'),
+        'FEDEX' => array('carrier_code' => 'fedex', 'title' => 'Federal Express'),
     );
 
     /**
@@ -37,7 +49,9 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
      */
     public function getAmazonAddress(Mage_Customer_Model_Address_Abstract $address)
     {
-        $amazonAddress = new FBAOutboundServiceMWS_Model_Address($this->getAmazonAddressArray($address));
+        $amazonAddress = new FBAOutboundServiceMWS_Model_Address(
+            $this->getAmazonAddressArray($address)
+        );
         return $amazonAddress;
     }
 
@@ -46,12 +60,14 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
      *
      * @return array
      */
-    public function getAmazonAddressArray(Mage_Customer_Model_Address_Abstract $address)
-    {
-        $regionCode = Mage::getModel('directory/region')->load($address->getRegionId())->getCode();
+    public function getAmazonAddressArray(
+        Mage_Customer_Model_Address_Abstract $address
+    ) {
+        $regionCode = Mage::getModel('directory/region')
+            ->load($address->getRegionId())->getCode();
         $city = $address->getCity() ? $address->getCity() : 'Mytown';
 
-        $addressData = array (
+        $addressData = array(
             'Name' => $address->getName(),
             'Line1' => $address->getStreet1(),
             'Line2' => $address->getStreet2(),
@@ -71,11 +87,15 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
      *
      * @return \FBAOutboundServiceMWS_Model_GetFulfillmentPreviewItemList|false
      */
-    public function getAmazonItems(Mage_Sales_Model_Resource_Quote_Item_Collection $items)
-    {
+    public function getAmazonItems(
+        Mage_Sales_Model_Resource_Quote_Item_Collection $items
+    ) {
         $amazonItemsData = $this->getAmazonItemsArray($items);
         if (!empty($amazonItemsData) && !empty($amazonItems['member'])) {
-            $amazonItems = new FBAOutboundServiceMWS_Model_GetFulfillmentPreviewItemList($amazonItemsData);
+            $amazonItems
+                = new FBAOutboundServiceMWS_Model_GetFulfillmentPreviewItemList(
+                    $amazonItemsData
+                );
             return $amazonItems;
         }
 
@@ -90,16 +110,20 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
     public function getAmazonItemsArrayFromRateRequest(array $items)
     {
         $amazonItems = array();
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $product = $item->getProduct();
             if ($product->getAmazonMcfEnabled()) {
                 $qty = $item->getQty();
-                $amazonItems[] = $this->getAmazonItem($product, $qty, $item->getQuoteId() . $item->getProductId());
+                $amazonItems[] = $this->getAmazonItem(
+                    $product,
+                    $qty,
+                    $item->getQuoteId() . $item->getProductId()
+                );
             }
         }
 
         if (!empty($amazonItems)) {
-            return  array('member' => $amazonItems);
+            return array('member' => $amazonItems);
         }
 
         return false;
@@ -116,12 +140,16 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
     public function getAmazonItemsArray($items)
     {
         $amazonItems = array();
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $product = $item->getProduct();
             if ($product->getAmazonMcfEnabled()) {
                 // qty differs for quote vs order items
                 $qty = $item->getQty() ? $item->getQty() : $item->getQtyOrdered();
-                $amazonItems[] = $this->getAmazonItem($product, $qty, $item->getItemId());
+                $amazonItems[] = $this->getAmazonItem(
+                    $product,
+                    $qty,
+                    $item->getItemId()
+                );
             }
         }
 
@@ -132,13 +160,15 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
      * Returns the array representation of a product to be used in a fulfillment preview
      *
      * @param $product
-     * @param int $qty
-     * @param int $itemId
+     * @param int     $qty
+     * @param int     $itemId
      *
      * @return array
      */
-    public function getAmazonItem($product, $qty, $itemId = 1) {
-        $sku = $product->getAmazonMcfSku() ? $product->getAmazonMcfSku() : $product->getSku();
+    public function getAmazonItem($product, $qty, $itemId = 1)
+    {
+        $sku = $product->getAmazonMcfSku()
+            ? $product->getAmazonMcfSku() : $product->getSku();
         $itemData = array(
             'SellerSKU' => $sku,
             'SellerFulfillmentOrderItemId' => $itemId,
@@ -148,6 +178,10 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
         return $itemData;
     }
 
+    /**
+     * @param $timestamp
+     * @return false|string
+     */
     public function getIso8601Timestamp($timestamp)
     {
         $timestamp = strtotime($timestamp);
@@ -155,10 +189,15 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
         return $converted;
     }
 
+    /**
+     * @param $shippingMethod
+     * @return mixed
+     */
     public function getShippingSpeed($shippingMethod)
     {
         /**
-         * Map built in Flat Rate, Table Rate, and Free Shipping to Amazon Standard shipping
+         * Map built in Flat Rate, Table Rate, and Free Shipping to
+         * Amazon Standard shipping
          */
         $methods = array(
             'flatrate_flatrate' => 'Standard',
@@ -172,15 +211,30 @@ class Amazon_MCF_Helper_Conversion extends Mage_Core_Helper_Abstract {
         return $methods[$shippingMethod];
     }
 
-    public function getCarrierCodeFromPackage($package) {
+    /**
+     * @param $package
+     * @return mixed
+     */
+    public function getCarrierCodeFromPackage($package)
+    {
         return $this->carriers[$package->getCarrierCode()]['carrier_code'];
     }
 
-    public function getCarrierTitleFromPackage($package) {
+    /**
+     * @param $package
+     * @return mixed
+     */
+    public function getCarrierTitleFromPackage($package)
+    {
         return $this->carriers[$package->getCarrierCode()]['title'];
     }
 
-    public function getNotificationEmailList($order) {
+    /**
+     * @param $order
+     * @return array
+     */
+    public function getNotificationEmailList($order)
+    {
         $notificationEmailList = array();
 
         if (Mage::helper('amazon_mcf')->sendShipmentEmail($order->getStore())) {

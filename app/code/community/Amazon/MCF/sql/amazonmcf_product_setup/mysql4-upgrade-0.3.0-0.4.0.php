@@ -15,7 +15,9 @@
  * permissions and limitations under the License.
  */
 
-/** @var $installer Mage_Sales_Model_Mysql4_Setup */
+/**
+ * @var $installer Mage_Sales_Model_Mysql4_Setup
+ */
 $installer = new Mage_Sales_Model_Mysql4_Setup();
 $installer->startSetup();
 
@@ -43,8 +45,17 @@ $submissionAttemptAttr = array (
 
 );
 
-$installer->addAttribute('order', 'amazon_order_status', $orderStatusAttr);
-$installer->addAttribute('order', 'amazon_order_submission_attempt_count', $submissionAttemptAttr);
+$installer->addAttribute(
+    'order',
+    'amazon_order_status',
+    $orderStatusAttr
+);
+
+$installer->addAttribute(
+    'order',
+    'amazon_order_submission_attempt_count',
+    $submissionAttemptAttr
+);
 
 $installer->endSetup();
 

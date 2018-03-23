@@ -15,7 +15,9 @@
  * permissions and limitations under the License.
  */
 
-/** @var $installer Mage_Sales_Model_Mysql4_Setup */
+/**
+ * @var $installer Mage_Sales_Model_Mysql4_Setup 
+ */
 $installer = new Mage_Sales_Model_Mysql4_Setup();
 $installer->startSetup();
 
@@ -35,4 +37,3 @@ $fba_attr = array (
 $installer->addAttribute('order', 'fulfilled_by_amazon', $fba_attr);
 
 $installer->endSetup();
-

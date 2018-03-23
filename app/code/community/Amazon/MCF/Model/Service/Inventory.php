@@ -15,27 +15,43 @@
  * permissions and limitations under the License.
  */
 
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'FBAInventoryServiceMWS' . DS . 'Client.php');
-require_once(Mage::getBaseDir('lib') . DS . 'Amazon'. DS .'FBAInventoryServiceMWS' . DS . 'Mock.php');
+require_once Mage::getBaseDir('lib') . DS . 'Amazon'
+    . DS . 'FBAInventoryServiceMWS' . DS . 'Client.php';
+require_once Mage::getBaseDir('lib') . DS . 'Amazon'
+    . DS . 'FBAInventoryServiceMWS' . DS . 'Mock.php';
 
-class Amazon_MCF_Model_Service_Inventory extends Amazon_MCF_Model_Service_Abstract {
+/**
+ * Class Amazon_MCF_Model_Service_Inventory
+ */
+class Amazon_MCF_Model_Service_Inventory extends Amazon_MCF_Model_Service_Abstract
+{
 
     const SERVICE_NAME = '/FulfillmentInventory/';
     const SERVICE_CLASS = 'FBAInventoryServiceMWS';
 
-    protected function getServiceVersion() {
+    /**
+     * @inheritdoc
+     */
+    protected function getServiceVersion()
+    {
         return FBAInventoryServiceMWS_Client::SERVICE_VERSION;
     }
+
     /**
      * Gets a list of inventory details based on Skus passed in an array
      *
-     * @param $sellerSKUs array
-     *
-     * @return mixed
+     * @param  array  $sellerSKUs
+     * @param  string $startTime
+     * @return null
      */
-    public function getFulfillmentInventoryList($sellerSKUs = array(), $startTime = '') {
+    public function getFulfillmentInventoryList(
+        $sellerSKUs = array(),
+        $startTime = ''
+    ) {
 
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
         $client = $this->getClient();
 
@@ -50,20 +66,32 @@ class Amazon_MCF_Model_Service_Inventory extends Amazon_MCF_Model_Service_Abstra
         }
 
         try {
-            $helper->logApi('listInventorySupply request: ' . var_export($request, true));
+            $helper->logApi(
+                'listInventorySupply request: '
+                . var_export($request, true)
+            );
             $response = $client->listInventorySupply($request);
-            $helper->logApi('listInventorySupply response: ' . $response->toXML());
+            $helper->logApi(
+                'listInventorySupply response: ' . $response->toXML()
+            );
         } catch (\FBAInventoryServiceMWS_Exception $e) {
-            $response = NULL;
+            $response = null;
             $helper->logApiError('listInventorySupply', $e);
         }
 
         return $response;
     }
 
-    public function getListInventorySupplyByNextToken($nextToken) {
+    /**
+     * @param string $nextToken
+     * @return null
+     */
+    public function getListInventorySupplyByNextToken($nextToken)
+    {
 
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = $this->helper;
         $client = $this->getClient();
 
@@ -74,11 +102,17 @@ class Amazon_MCF_Model_Service_Inventory extends Amazon_MCF_Model_Service_Abstra
         );
 
         try {
-            $helper->logApi('listInventorySupplyByNextToken request: ' . var_export($request, true));
+            $helper->logApi(
+                'listInventorySupplyByNextToken request: '
+                . var_export($request, true)
+            );
             $response = $client->listInventorySupplyByNextToken($request);
-            $helper->logApi('listInventorySupplyByNextToken response: ' . $response->toXML());
+            $helper->logApi(
+                'listInventorySupplyByNextToken response: '
+                . $response->toXML()
+            );
         } catch (\FBAInventoryServiceMWS_Exception $e) {
-            $response = NULL;
+            $response = null;
             $helper->logApiError('listInventorySupplyByNextToken', $e);
         }
 

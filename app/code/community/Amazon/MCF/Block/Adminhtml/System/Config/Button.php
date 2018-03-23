@@ -15,8 +15,15 @@
  * permissions and limitations under the License.
  */
 
-class Amazon_MCF_Block_Adminhtml_System_Config_Button extends Mage_Adminhtml_Block_System_Config_Form_Field
+/**
+ * Class Amazon_MCF_Block_Adminhtml_System_Config_Button
+ */
+class Amazon_MCF_Block_Adminhtml_System_Config_Button
+    extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
+    /**
+     * @inheritdoc
+     */
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
         $url = $this->getUrl('adminhtml/mcf/sync');

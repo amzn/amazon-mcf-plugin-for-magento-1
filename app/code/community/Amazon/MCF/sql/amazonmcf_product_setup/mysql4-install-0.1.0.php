@@ -15,7 +15,10 @@
  * permissions and limitations under the License.
  */
 
-/** @var $installer Mage_Catalog_Model_Resource_Setup */
+/**
+ * @var $installer Mage_Catalog_Model_Resource_Setup 
+ */
+
 $installer = $this;
 $installer->startSetup();
 
@@ -40,8 +43,16 @@ $sku_attr = array (
     'apply_to' => Mage_Catalog_Model_Product_Type::TYPE_SIMPLE,
 );
 
-$installer->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'amazon_mcf_enabled', $enabled_attr);
-$installer->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'amazon_mcf_sku', $sku_attr);
+$installer->addAttribute(
+    Mage_Catalog_Model_Product::ENTITY,
+    'amazon_mcf_enabled',
+    $enabled_attr
+);
+
+$installer->addAttribute(
+    Mage_Catalog_Model_Product::ENTITY,
+    'amazon_mcf_sku',
+    $sku_attr
+);
 
 $installer->endSetup();
-

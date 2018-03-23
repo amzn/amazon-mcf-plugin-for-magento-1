@@ -15,23 +15,30 @@
  * permissions and limitations under the License.
  */
 
+/**
+ * Class Amazon_MCF_AjaxController
+ */
 class Amazon_MCF_AjaxController extends Mage_Core_Controller_Front_Action
 {
 
     /**
      * Delivery date estimate action
      */
-    public function deliveryEstimateAction() {
+    public function deliveryEstimateAction()
+    {
         $zip = $this->getRequest()->getParam('zip');
         $productId = $this->getRequest()->getParam('product_id');
         $qty = $this->getRequest()->getParam('qty');
 
-        /** @var Amazon_MCF_Model_Service_Outbound $service */
+        /**
+         * @var Amazon_MCF_Model_Service_Outbound $service
+         */
         $service = Mage::getSingleton('amazon_mcf/service_outbound');
         $fulfillmentPreview = $service->getDeliveryEstimate($productId, $zip, $qty);
 
         $amazonShipping = Mage::getModel('amazon_mcf/carrier_amazon');
-        $deliveryData = $amazonShipping->getRatesFromFulfillmentPreview($fulfillmentPreview);
+        $deliveryData
+            = $amazonShipping->getRatesFromFulfillmentPreview($fulfillmentPreview);
 
         $rates = array();
         foreach ($deliveryData as $speed => $rate) {
@@ -40,18 +47,31 @@ class Amazon_MCF_AjaxController extends Mage_Core_Controller_Front_Action
 
         foreach ($sortedRates as $speed) {
             $rate = $deliveryData[$speed];
-            $earliest = date(Amazon_MCF_Helper_Conversion::ISO8601_FORMAT, $rate['earliest']);
-            $latest = date(Amazon_MCF_Helper_Conversion::ISO8601_FORMAT, $rate['latest']);
-            $rates[] = array('type' => $speed, 'earliest' => $earliest, 'latest' => $latest, 'cost' => $rate['fee']);
+            $earliest = date(
+                Amazon_MCF_Helper_Conversion::ISO8601_FORMAT,
+                $rate['earliest']
+            );
+            $latest = date(
+                Amazon_MCF_Helper_Conversion::ISO8601_FORMAT,
+                $rate['latest']
+            );
+            $rates[] = array(
+                'type' => $speed,
+                'earliest' => $earliest,
+                'latest' => $latest,
+                'cost' => $rate['fee']
+            );
         }
 
         $jsonData = array(
-            'result' => TRUE,
+            'result' => true,
             'message' => 'Rates available',
             'data' => $rates,
         );
 
-        $this->getResponse()->setHeader('Content-type', 'application/json');
-        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($jsonData));
+        $this->getResponse()
+            ->setHeader('Content-type', 'application/json');
+        $this->getResponse()
+            ->setBody(Mage::helper('core')->jsonEncode($jsonData));
     }
 }

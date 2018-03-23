@@ -15,26 +15,39 @@
  * permissions and limitations under the License.
  */
 
+/**
+ * Class Amazon_MCF_McfController
+ */
 class Amazon_MCF_McfController extends Mage_Adminhtml_Controller_Action
 {
+    /**
+     * Sync page callback
+     */
     public function syncAction()
     {
-        /** @var Amazon_MCF_Helper_Data $helper */
+        /**
+         * @var Amazon_MCF_Helper_Data $helper
+         */
         $helper = Mage::helper('amazon_mcf');
         $startedSync = $helper->startInventorySync();
 
         if ($startedSync) {
             $message = 'Started full inventory sync via admin action';
-            Mage::getSingleton("adminhtml/session")->addSuccess($this->__($message));
+            Mage::getSingleton("adminhtml/session")
+                ->addSuccess($this->__($message));
         } else {
             $message = 'Inventory sync already running';
-            Mage::getSingleton("adminhtml/session")->addWarning($this->__($message));
+            Mage::getSingleton("adminhtml/session")
+                ->addWarning($this->__($message));
         }
         $helper->logInventory($message);
 
         $this->_redirectReferer();
     }
 
+    /**
+     * Validates Amazon credentials
+     */
     public function validateCredentialsAction()
     {
         $request = $this->getRequest();
@@ -43,23 +56,43 @@ class Amazon_MCF_McfController extends Mage_Adminhtml_Controller_Action
         $accessKey = $request->getParam('access_key_id');
         $secretKey = $request->getParam('secret_access_key');
 
-        /** @var Amazon_MCF_Model_Service_Sellers $service */
+        /**
+         * @var Amazon_MCF_Model_Service_Sellers $service
+         */
         $service = Mage::getModel('amazon_mcf/service_sellers');
-        $result = $service->validateCredentials($marketplace, $sellerId, $accessKey, $secretKey);
+        $result = $service->validateCredentials(
+            $marketplace,
+            $sellerId,
+            $accessKey,
+            $secretKey
+        );
 
         if ($result) {
             $jsonData = array(
-            'result' => true,
-            'message' => '<b style="color:green">' . $this->__("Your Amazon MWS API credentials are valid, please save config to apply.") . '</b>',
+                'result' => true,
+                'message' => '<b style="color:green">'
+                    . $this->__(
+                        "Your Amazon MWS API credentials are valid, 
+                    please save config to apply."
+                    ) . '</b>',
             );
         } else {
             $jsonData = array(
                 'result' => true,
-                'message' => '<b style="color:red">' . $this->__("Your Amazon MWS API credentials are not valid. Please verify keys were entered correctly, and check user guide for more details on obtaining keys.") . '</b>',
+                'message' => '<b style="color:red">'
+                    . $this->__(
+                        "Your Amazon MWS API credentials are not valid. 
+                    Please verify keys were entered correctly, and check user guide 
+                    for more details on obtaining keys."
+                    ) . '</b>',
             );
         }
 
-        $this->getResponse()->setHeader('Content-type', 'application/json');
-        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($jsonData));
+        $this->getResponse()->setHeader(
+            'Content-type',
+            'application/json'
+        );
+        $this->getResponse()
+            ->setBody(Mage::helper('core')->jsonEncode($jsonData));
     }
 }
