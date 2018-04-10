@@ -95,4 +95,15 @@ class Amazon_MCF_McfController extends Mage_Adminhtml_Controller_Action
         $this->getResponse()
             ->setBody(Mage::helper('core')->jsonEncode($jsonData));
     }
+
+    /**
+     * Only allow admins with appropriate permission to run these actions
+     *
+     * @return mixed
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')
+            ->isAllowed('system/config/amazon_mcf');
+    }
 }
